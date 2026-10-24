@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "ent2 ext",
+  "version": "3.0",
+  "description": "ent2 확장 프로그램: 검색, 탐색, 커뮤니티, 프로필 UI 및 이동용 설정 도구",
+  "permissions": ["storage", "downloads", "notifications"],
+  "icons": {
+    "16": "logo.png",
+    "32": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "logo.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://playentry.org/*",
+    "https://*.playentry.org/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://playentry.org/*", "https://*.playentry.org/*"],
+      "js": [
+        "html2canvas.min.js",
+        "modules/core/config.js",
+        "modules/core/utils.js",
+        "modules/core/domObserver.js",
+        "modules/ent2/storage.js",
+        "modules/ent2/searchHistory.js",
+        "modules/ent2/userSearch.js",
+        "modules/ent2/profileView.js",
+        "modules/ent2/commFilter.js",
+        "modules/ent2/projectExplore.js",
+        "modules/ent2/ent2Router.js",
+        "content.js"
+      ],
+      "run_at": "document_end"
+    },
+    {
+      "matches": ["https://playentry.org/*", "https://*.playentry.org/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.html", "popup.js", "logo.png", "inject.js", "content.js", "ent2.svg", "selectproject.svg"],
+      "matches": ["https://playentry.org/*", "https://*.playentry.org/*"]
+    }
+  ]
+}

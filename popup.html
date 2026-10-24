@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>ent2 ext</title>
+  <style>
+    :root {
+      --bg: #eef2fb;
+      --surface: #ffffff;
+      --surface-2: #f7f9ff;
+      --ink: #16213e;
+      --soft: #5b6688;
+      --accent: #3e6bff;
+      --accent-soft: #e4ebff;
+      --line: #dfe6f8;
+      --shadow: 0 12px 28px rgba(22, 33, 62, 0.08);
+      --radius: 18px;
+      --body: 'NanumGothic', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 360px;
+      min-height: 420px;
+      font-family: var(--body);
+      background: radial-gradient(1000px 420px at -10% -20%, #e3ebff 0%, rgba(227,235,255,0) 58%), var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    .popup-shell { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+    .header {
+      background: rgba(255,255,255,0.82); border: 1px solid var(--line); border-radius: 18px;
+      padding: 14px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .logo { width: 38px; height: 38px; border-radius: 12px; object-fit: cover; background: var(--accent-soft); border: 1px solid var(--line); }
+    .brand-text { display: flex; flex-direction: column; gap: 2px; }
+    .brand-title { font-size: 18px; font-weight: 800; letter-spacing: -0.04em; }
+    .brand-sub { font-size: 11px; color: var(--soft); }
+    .header-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .header-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .card { background: rgba(255,255,255,0.82); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px; }
+    .card-title { font-size: 11.5px; font-weight: 800; color: var(--soft); letter-spacing: 0.05em; text-transform: uppercase; }
+    .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 76px; padding: 12px 8px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 2px; }
+    .switch-row + .switch-row { margin-top: 10px; }
+    .switch-label { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+    .switch-label strong { font-size: 12px; color: var(--ink); }
+    .switch-label span { font-size: 11px; color: var(--soft); }
+    .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background-color: #cfd9ef; border-radius: 999px; transition: .2s; cursor: pointer; }
+    .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(22,33,62,.18); transition: .2s; }
+    .switch input:checked + .slider { background-color: var(--accent); }
+    .switch input:checked + .slider:before { transform: translateX(18px); }
+    .footer { text-align: center; color: var(--soft); font-size: 11px; font-weight: 700; padding-top: 2px; }
+  </style>
+</head>
+<body>
+  <div class="popup-shell">
+    <header class="header">
+      <div class="brand">
+        <img src="logo.png" alt="ent2 Logo" class="logo" />
+        <div class="brand-text">
+          <div class="brand-title">ent2</div>
+          <div class="brand-sub">ext 설정</div>
+        </div>
+      </div>
+      <button type="button" class="header-btn primary" id="btn-ent2-open">열기</button>
+    </header>
+
+    <section class="card">
+      <div class="card-title">바로가기</div>
+      <div class="nav-grid">
+        <button class="nav-btn" id="btn-ent2-home" type="button">
+          <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>
+          playentry 홈
+        </button>
+        <button class="nav-btn" id="btn-ent2-main" type="button">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          ent2 메인
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="switch-row">
+        <div class="switch-label">
+          <strong>확장 기능 사용</strong>
+          <span>사이트에 ent2 기능을 활성화합니다.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-ent2-enabled" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="switch-row">
+        <div class="switch-label">
+          <strong>모바일 메뉴 연동</strong>
+          <span>모바일 메뉴에 단축 경로를 노출합니다.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-ent2-mobile" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="switch-row">
+        <div class="switch-label">
+          <strong>하루 동안 유저 목록 저장</strong>
+          <span>로컬에 데이터가 저장되어, 유저 로딩이 순식간에 되어요.</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-ent2-user-cache" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <button type="button" class="header-btn" id="btn-reload-index" style="margin-top:10px; width:100%;">데이터 다시 로드</button>
+    </section>
+
+    <div class="footer">ent2 ext 설정</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
