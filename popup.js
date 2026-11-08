@@ -5,6 +5,8 @@
   const ENT2_URL = 'https://playentry.org/ent2';
   const HOME_URL = 'https://playentry.org';
   const FORCE_RELOAD_KEY = 'ent2_user_index_force_refresh_ts';
+  const THEME_KEY = 'ent2_theme_mode';
+  const LEGACY_THEME_KEY = 'ent2_popup_theme';
 
   const getStorage = () => {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
@@ -52,6 +54,39 @@
     if (el) el.checked = !!value;
   };
 
+  const applyPopupTheme = (theme) => {
+    const selected = theme === 'light' || theme === 'light-mode' ? 'light' : 'ash';
+    document.body.dataset.theme = selected;
+    const label = document.getElementById('popup-theme-label');
+    const button = document.getElementById('popup-theme-toggle');
+    if (label) label.textContent = selected === 'ash' ? '화이트' : '애시';
+    if (button) {
+      button.setAttribute('aria-label', `${selected === 'ash' ? '화이트' : '애시'} 테마로 변경`);
+      button.title = `${selected === 'ash' ? '화이트' : '애시'} 테마로 변경`;
+    }
+  };
+
+  const readPopupTheme = () => {
+    const storage = getStorage();
+    if (!storage) {
+      return Promise.resolve(localStorage.getItem(THEME_KEY) || localStorage.getItem(LEGACY_THEME_KEY) || 'ash');
+    }
+    return new Promise((resolve) => {
+      storage.get([THEME_KEY, LEGACY_THEME_KEY], (res) => {
+        resolve(res[THEME_KEY] || res[LEGACY_THEME_KEY] || 'ash');
+      });
+    });
+  };
+
+  const savePopupTheme = (theme) => {
+    const storage = getStorage();
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch (_) {}
+    if (!storage) return;
+    storage.set({ [THEME_KEY]: theme }, () => {});
+  };
+
   const openTab = (url) => {
     if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
       chrome.tabs.create({ url });
@@ -96,10 +131,16 @@
   const mainBtn = document.getElementById('btn-ent2-main');
   const homeBtn = document.getElementById('btn-ent2-home');
   const reloadBtn = document.getElementById('btn-reload-index');
+  const themeBtn = document.getElementById('popup-theme-toggle');
 
   if (openBtn) openBtn.addEventListener('click', () => openTab(ENT2_URL));
   if (mainBtn) mainBtn.addEventListener('click', () => openTab(ENT2_URL));
   if (homeBtn) homeBtn.addEventListener('click', () => openTab(HOME_URL));
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const nextTheme = document.body.dataset.theme === 'ash' ? 'light' : 'ash';
+    applyPopupTheme(nextTheme);
+    savePopupTheme(nextTheme);
+  });
   if (reloadBtn) reloadBtn.addEventListener('click', async () => {
     await setReloadMark();
     if (typeof chrome !== 'undefined' && chrome.tabs) {
@@ -110,6 +151,8 @@
   bindToggle('toggle-ent2-enabled', 'ent2_enabled');
   bindToggle('toggle-ent2-mobile', 'ent2_mobile_enabled');
   bindToggle('toggle-ent2-user-cache', 'ent2_user_cache_daily');
+
+  readPopupTheme().then(applyPopupTheme);
 
   (async () => {
     const settings = await readSettings();

@@ -1,132 +1,209 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ent2 ext</title>
   <style>
     :root {
-      --bg: #eef2fb;
-      --surface: #ffffff;
-      --surface-2: #f7f9ff;
-      --ink: #16213e;
-      --soft: #5b6688;
-      --accent: #3e6bff;
-      --accent-soft: #e4ebff;
-      --line: #dfe6f8;
-      --shadow: 0 12px 28px rgba(22, 33, 62, 0.08);
-      --radius: 18px;
+      color-scheme: dark;
+      --bg: #2c2d32;
+      --surface: #323339;
+      --surface-raised: #414248;
+      --surface-soft: #3a3b42;
+      --ink: #f5f6f7;
+      --muted: #a4a6ad;
+      --line: rgba(255,255,255,.09);
+      --accent: #32d27d;
+      --accent-ink: #16271d;
+      --accent-soft: rgba(50,210,125,.13);
+      --shadow: 0 18px 48px rgba(0,0,0,.2);
       --body: 'NanumGothic', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    body[data-theme="light"] {
+      color-scheme: light;
+      --bg: #eef2fb;
+      --surface: #fcfdfe;
+      --surface-raised: #ffffff;
+      --surface-soft: #f3f6fc;
+      --ink: #17233c;
+      --muted: #71809b;
+      --line: #e2e8f3;
+      --accent: #3182f6;
+      --accent-ink: #ffffff;
+      --accent-soft: #e8f1ff;
+      --shadow: 0 18px 48px rgba(38,63,105,.09);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 360px;
-      min-height: 420px;
-      font-family: var(--body);
-      background: radial-gradient(1000px 420px at -10% -20%, #e3ebff 0%, rgba(227,235,255,0) 58%), var(--bg);
+      width: 380px;
+      min-height: 500px;
+      background: var(--bg);
       color: var(--ink);
+      font-family: var(--body);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      transition: background .2s ease, color .2s ease;
     }
     button, input { font: inherit; }
-    .popup-shell { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 12px; }
-    .header {
-      background: rgba(255,255,255,0.82); border: 1px solid var(--line); border-radius: 18px;
-      padding: 14px; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    button { color: inherit; }
+    .popup-shell { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 1px 2px 3px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo-wrap { width: 38px; height: 38px; border-radius: 13px; overflow: hidden; background: var(--surface-soft); box-shadow: inset 0 0 0 1px var(--line); }
+    .logo { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .brand-name { font-size: 17px; line-height: 1.15; font-weight: 850; letter-spacing: -.04em; }
+    .brand-caption { margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+    .theme-btn {
+      min-height: 34px; padding: 0 11px; display: inline-flex; align-items: center; gap: 7px;
+      border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+      color: var(--muted); font-size: 10px; font-weight: 750; cursor: pointer; transition: .18s ease;
     }
-    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .logo { width: 38px; height: 38px; border-radius: 12px; object-fit: cover; background: var(--accent-soft); border: 1px solid var(--line); }
-    .brand-text { display: flex; flex-direction: column; gap: 2px; }
-    .brand-title { font-size: 18px; font-weight: 800; letter-spacing: -0.04em; }
-    .brand-sub { font-size: 11px; color: var(--soft); }
-    .header-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
-    .header-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .card { background: rgba(255,255,255,0.82); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 12px; }
-    .card-title { font-size: 11.5px; font-weight: 800; color: var(--soft); letter-spacing: 0.05em; text-transform: uppercase; }
-    .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    .nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 76px; padding: 12px 8px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font-size: 11.5px; font-weight: 700; cursor: pointer; }
-    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.2; fill: none; }
-    .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 2px; }
-    .switch-row + .switch-row { margin-top: 10px; }
-    .switch-label { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-    .switch-label strong { font-size: 12px; color: var(--ink); }
-    .switch-label span { font-size: 11px; color: var(--soft); }
-    .switch { position: relative; display: inline-block; width: 42px; height: 24px; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; inset: 0; background-color: #cfd9ef; border-radius: 999px; transition: .2s; cursor: pointer; }
-    .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(22,33,62,.18); transition: .2s; }
-    .switch input:checked + .slider { background-color: var(--accent); }
-    .switch input:checked + .slider:before { transform: translateX(18px); }
-    .footer { text-align: center; color: var(--soft); font-size: 11px; font-weight: 700; padding-top: 2px; }
+    .theme-btn:hover { color: var(--ink); border-color: var(--accent); }
+    .theme-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .hero {
+      position: relative; overflow: hidden; padding: 19px; min-height: 132px;
+      display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+      border: 1px solid var(--line); border-radius: 21px;
+      background: linear-gradient(135deg, var(--surface-raised), var(--surface));
+      box-shadow: var(--shadow);
+    }
+    .hero:after { content: ""; position: absolute; width: 150px; height: 150px; right: -66px; top: -72px; border: 24px solid var(--accent-soft); border-radius: 50%; pointer-events: none; }
+    .hero-top, .hero-bottom { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .eyebrow { color: var(--accent); font-size: 9px; font-weight: 850; letter-spacing: .15em; text-transform: uppercase; }
+    .hero-title { margin-top: 3px; font-size: 20px; font-weight: 850; letter-spacing: -.055em; }
+    .hero-copy { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 9px; font-weight: 700; white-space: nowrap; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+    .open-btn {
+      min-height: 34px; padding: 0 13px; display: inline-flex; align-items: center; gap: 8px;
+      border: 0; border-radius: 11px; background: var(--accent); color: var(--accent-ink);
+      font-size: 10px; font-weight: 850; cursor: pointer; transition: transform .18s ease, filter .18s ease;
+    }
+    .open-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .open-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; margin: 2px 2px -4px; }
+    .section-title { font-size: 11px; font-weight: 850; letter-spacing: -.01em; }
+    .section-hint { color: var(--muted); font-size: 9px; font-weight: 650; }
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .quick-card {
+      min-height: 61px; padding: 11px; display: flex; align-items: center; gap: 10px;
+      text-align: left; border: 1px solid var(--line); border-radius: 15px;
+      background: var(--surface); cursor: pointer; transition: .18s ease;
+    }
+    .quick-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .quick-icon { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; border-radius: 11px; background: var(--accent-soft); color: var(--accent); }
+    .quick-icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+    .quick-label { font-size: 10px; font-weight: 800; }
+    .quick-note { margin-top: 1px; color: var(--muted); font-size: 8px; }
+    .panel { padding: 4px 13px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+    .setting-row { min-height: 57px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .setting-row + .setting-row { border-top: 1px solid var(--line); }
+    .setting-text { min-width: 0; }
+    .setting-name { font-size: 10px; font-weight: 800; }
+    .setting-desc { margin-top: 2px; color: var(--muted); font-size: 8.5px; line-height: 1.45; }
+    .switch { position: relative; display: inline-flex; flex: 0 0 auto; width: 36px; height: 21px; }
+    .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .slider { position: absolute; inset: 0; border-radius: 999px; background: var(--surface-soft); cursor: pointer; transition: .2s ease; box-shadow: inset 0 0 0 1px var(--line); }
+    .slider:before { content: ""; position: absolute; width: 15px; height: 15px; left: 3px; top: 3px; border-radius: 50%; background: var(--muted); transition: .2s ease; }
+    .switch input:checked + .slider { background: var(--accent); box-shadow: none; }
+    .switch input:checked + .slider:before { transform: translateX(15px); background: var(--accent-ink); }
+    .switch input:focus-visible + .slider { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .cache-panel { padding: 12px 13px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+    .cache-copy { min-width: 0; }
+    .cache-title { font-size: 10px; font-weight: 800; }
+    .cache-desc { margin-top: 2px; color: var(--muted); font-size: 8px; }
+    .reload-btn { flex: 0 0 auto; min-height: 31px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); color: var(--ink); font-size: 9px; font-weight: 800; cursor: pointer; transition: .18s ease; }
+    .reload-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .reload-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .footer { padding: 0 2px 1px; display: flex; justify-content: space-between; color: var(--muted); font-size: 8px; font-weight: 650; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   </style>
 </head>
-<body>
-  <div class="popup-shell">
-    <header class="header">
+<body data-theme="ash">
+  <main class="popup-shell">
+    <header class="topbar">
       <div class="brand">
-        <img src="logo.png" alt="ent2 Logo" class="logo" />
-        <div class="brand-text">
-          <div class="brand-title">ent2</div>
-          <div class="brand-sub">ext 설정</div>
+        <span class="logo-wrap"><img src="logo.png" alt="" class="logo"></span>
+        <div>
+          <div class="brand-name">ent2</div>
+          <div class="brand-caption">PLAYENTRY COMPANION</div>
         </div>
       </div>
-      <button type="button" class="header-btn primary" id="btn-ent2-open">열기</button>
+      <button type="button" class="theme-btn" id="popup-theme-toggle" aria-label="테마 변경">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>
+        <span id="popup-theme-label">화이트</span>
+      </button>
     </header>
 
-    <section class="card">
-      <div class="card-title">바로가기</div>
-      <div class="nav-grid">
-        <button class="nav-btn" id="btn-ent2-home" type="button">
-          <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg>
-          playentry 홈
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow">YOUR ENTRY TOOLKIT</div>
+          <h1 class="hero-title">ent2 바로가기</h1>
+          <p class="hero-copy">검색과 탐색을 더 빠르게 시작하세요.</p>
+        </div>
+        <span class="status"><i class="status-dot"></i> READY</span>
+      </div>
+      <div class="hero-bottom">
+        <span class="section-hint">확장 프로그램 대시보드</span>
+        <button type="button" class="open-btn" id="btn-ent2-open">
+          ent2 열기
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5"></path></svg>
         </button>
-        <button class="nav-btn" id="btn-ent2-main" type="button">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          ent2 메인
-        </button>
       </div>
     </section>
 
-    <section class="card">
-      <div class="switch-row">
-        <div class="switch-label">
-          <strong>확장 기능 사용</strong>
-          <span>사이트에 ent2 기능을 활성화합니다.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="toggle-ent2-enabled" checked>
-          <span class="slider"></span>
-        </label>
-      </div>
+    <div class="section-heading">
+      <h2 class="section-title">빠른 이동</h2>
+      <span class="section-hint">QUICK LINKS</span>
+    </div>
+    <section class="quick-grid" aria-label="빠른 이동">
+      <button class="quick-card" id="btn-ent2-home" type="button">
+        <span class="quick-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"></path><path d="M5 9v11h14V9M9 20v-6h6v6"></path></svg></span>
+        <span><span class="quick-label">playentry 홈</span><span class="quick-note">공식 사이트 열기</span></span>
+      </button>
+      <button class="quick-card" id="btn-ent2-main" type="button">
+        <span class="quick-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></span>
+        <span><span class="quick-label">ent2 메인</span><span class="quick-note">검색·탐색으로 이동</span></span>
+      </button>
+    </section>
 
-      <div class="switch-row">
-        <div class="switch-label">
-          <strong>모바일 메뉴 연동</strong>
-          <span>모바일 메뉴에 단축 경로를 노출합니다.</span>
+    <div class="section-heading">
+      <h2 class="section-title">기능 설정</h2>
+      <span class="section-hint">PREFERENCES</span>
+    </div>
+    <section class="panel" aria-label="기능 설정">
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">확장 기능 사용</div>
+          <div class="setting-desc">사이트에서 ent2 기능을 활성화합니다.</div>
         </div>
-        <label class="switch">
-          <input type="checkbox" id="toggle-ent2-mobile" checked>
-          <span class="slider"></span>
-        </label>
+        <label class="switch"><input type="checkbox" id="toggle-ent2-enabled" aria-label="확장 기능 사용" checked><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-text">
+          <div class="setting-name">모바일 메뉴 연동</div>
+          <div class="setting-desc">모바일 메뉴에 ent2 단축 경로를 표시합니다.</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="toggle-ent2-mobile" aria-label="모바일 메뉴 연동" checked><span class="slider"></span></label>
       </div>
     </section>
 
-    <section class="card">
-      <div class="switch-row">
-        <div class="switch-label">
-          <strong>하루 동안 유저 목록 저장</strong>
-          <span>로컬에 데이터가 저장되어, 유저 로딩이 순식간에 되어요.</span>
-        </div>
-        <label class="switch">
-          <input type="checkbox" id="toggle-ent2-user-cache" checked>
-          <span class="slider"></span>
-        </label>
+    <section class="cache-panel" aria-label="유저 데이터 설정">
+      <div class="cache-copy">
+        <div class="cache-title">유저 검색 데이터 캐시</div>
+        <div class="cache-desc">하루 동안 저장해 빠르게 불러옵니다.</div>
+        <label class="switch" style="margin-top:8px;"><input type="checkbox" id="toggle-ent2-user-cache" aria-label="하루 동안 유저 검색 데이터 캐시" checked><span class="slider"></span></label>
       </div>
-      <button type="button" class="header-btn" id="btn-reload-index" style="margin-top:10px; width:100%;">데이터 다시 로드</button>
+      <button type="button" class="reload-btn" id="btn-reload-index">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M5.6 9a7 7 0 0 1 11.7-2L20 12M4 12l2.7 5a7 7 0 0 0 11.7-2"></path></svg>
+        데이터 갱신
+      </button>
     </section>
 
-    <div class="footer">ent2 ext 설정</div>
-  </div>
-
+    <footer class="footer"><span>ent2 ext</span><span>Made for playentry</span></footer>
+  </main>
   <script src="popup.js"></script>
 </body>
 </html>

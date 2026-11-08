@@ -12,9 +12,67 @@ const ENT2_USER_INDEX_IDB_DB = 'ent2_user_index_db';
 const ENT2_USER_INDEX_IDB_STORE = 'user_index';
 const ENT2_USER_INDEX_CACHE_ENABLED_KEY = 'ent2_user_cache_daily';
 const ENT2_USER_INDEX_REFRESH_KEY = 'ent2_user_index_force_refresh_ts';
+const ENT2_USER_INDEX_INITIALIZED_KEY = 'ent2_user_index_initialized';
 const ENT2_USER_INDEX_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const ENT2_USER_INDEX_CACHE_SAFE_BYTES = 10 * 1024 * 1024;
-const ENT2_USER_INDEX_CACHE_VERSION = 3;
+const ENT2_USER_INDEX_CACHE_VERSION = 4;
+
+function hasEnt2UserIndexInitialized() {
+  try {
+    return localStorage.getItem(ENT2_USER_INDEX_INITIALIZED_KEY) === 'true';
+  } catch (_) {
+    return false;
+  }
+}
+
+function markEnt2UserIndexInitialized() {
+  try {
+    localStorage.setItem(ENT2_USER_INDEX_INITIALIZED_KEY, 'true');
+  } catch (_) {}
+}
+
+function parseEnt2NullableCount(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+function normalizeEnt2StoredProfileImage(value) {
+  if (typeof value !== 'string') return value || null;
+  const path = value.trim();
+  if (!path) return null;
+  if (/^(https?:)?\/\//i.test(path)) return path;
+  if (/^\/uploads\//i.test(path)) return path;
+  return `/uploads/${path.replace(/^\/?uploads\//i, '').replace(/^\/+/, '')}`;
+}
+
+function getEnt2StoredProfileImagePath(profileImage) {
+  if (typeof profileImage === 'string') {
+    const normalized = normalizeEnt2StoredProfileImage(profileImage);
+    if (!normalized) return null;
+    if (/^https?:/i.test(normalized)) {
+      try {
+        const url = new URL(normalized);
+        const uploadsIndex = url.pathname.indexOf('/uploads/');
+        return uploadsIndex >= 0 ? url.pathname.slice(uploadsIndex + '/uploads/'.length) : normalized;
+      } catch (_) {
+        return normalized;
+      }
+    }
+    return normalized.replace(/^\/uploads\//i, '');
+  }
+  if (!profileImage || typeof profileImage !== 'object') return null;
+  const filename = String(profileImage.filename || profileImage.name || '').trim();
+  if (filename) {
+    const imageName = filename.includes('.')
+      ? filename
+      : `${filename}.${String(profileImage.imageType || profileImage.type || 'png')}`;
+    if (imageName.startsWith('avatar/')) return imageName;
+    const cleanName = imageName.replace(/^\/+/, '');
+    return `${cleanName.slice(0, 2)}/${cleanName.slice(2, 4)}/${cleanName}`;
+  }
+  return getEnt2StoredProfileImagePath(profileImage.imageUrl || profileImage.url || null);
+}
 
 function isEnt2UserIndexCacheEnabled() {
   try {
@@ -148,25 +206,22 @@ function buildEnt2CompactCachePayload(users) {
   const compactMap = {};
 
   for (const user of safeUsers) {
-    const nickname = String(user?.nickname || user?.name || user?.displayName || '').trim();
+    const nickname = String(user?.nickname || user?.n || user?.name || user?.displayName || '').trim();
     const id = String(user?.id || user?._id || user?.userId || user?.user_id || '').trim();
     if (!nickname || !id) continue;
 
-    const profileImage = user?.profileImage || user?.avatar || user?.profile_image || null;
-    const profileMeta = normalizeEnt2ProfileImageMeta(profileImage);
-    const follower = Number.isFinite(Number(user?.follower)) ? Number(user.follower) : null;
-    const following = Number.isFinite(Number(user?.following)) ? Number(user.following) : null;
-    const created = user?.created || user?.createdAt || user?.joinedAt || null;
-    const lower = nickname.toLowerCase();
-    if (!compactMap[lower]) {
-      compactMap[lower] = {
+    const profileImage = user?.profileImage || user?.avatar || user?.profile_image || user?.pi || null;
+    const created = user?.created || user?.createdAt || user?.joinedAt || user?.c || null;
+    const lastUpdated = user?.lastUpdated || user?.updated || user?.lu || null;
+    if (!compactMap[id]) {
+      compactMap[id] = {
+        id,
         n: nickname,
-        i: id,
-        p: profileMeta.filename || '',
-        t: profileMeta.imageType || 'png',
-        f: follower,
-        g: following,
-        c: created ? String(created) : ''
+        pi: getEnt2StoredProfileImagePath(profileImage),
+        fr: parseEnt2NullableCount(user?.follower ?? user?.fr),
+        fg: parseEnt2NullableCount(user?.following ?? user?.fg),
+        c: created ? String(created) : null,
+        lu: lastUpdated ? String(lastUpdated) : null
       };
     }
   }
@@ -221,7 +276,7 @@ async function readEnt2UserIndexCacheFromIdb() {
       const req = store.get(ENT2_USER_INDEX_CACHE_KEY);
       req.onsuccess = () => {
         const value = req.result || null;
-        if (value && value.v !== undefined && value.v !== ENT2_USER_INDEX_CACHE_VERSION && value.v !== 2) {
+        if (value && value.v !== undefined && value.v !== ENT2_USER_INDEX_CACHE_VERSION && value.v !== 3 && value.v !== 2) {
           resolve(null);
           return;
         }
@@ -342,7 +397,7 @@ async function readEnt2UserIndexCache() {
             resolve(null);
             return;
           }
-          if (cached.v !== ENT2_USER_INDEX_CACHE_VERSION && cached.v !== 2) {
+          if (cached.v !== ENT2_USER_INDEX_CACHE_VERSION && cached.v !== 3 && cached.v !== 2) {
             chrome.storage.local.remove([ENT2_USER_INDEX_CACHE_KEY]);
             resolve(null);
             return;
@@ -371,7 +426,7 @@ async function readEnt2UserIndexCache() {
         }
       }
       if (!parsed || parsed.v === undefined) return null;
-      if (parsed.v !== ENT2_USER_INDEX_CACHE_VERSION && parsed.v !== 2) {
+      if (parsed.v !== ENT2_USER_INDEX_CACHE_VERSION && parsed.v !== 3 && parsed.v !== 2) {
         localStorage.removeItem(ENT2_USER_INDEX_CACHE_KEY);
         return null;
       }
@@ -502,16 +557,19 @@ function hydrateEnt2UserIndexFromCache(users) {
     ? users
     : Object.entries(users).map(([lowerKey, value]) => {
         const meta = value && typeof value === 'object' ? value : { i: value };
-        const nickname = String(meta.n || lowerKey || '').trim();
-        const rawId = meta.i ?? meta.id ?? value ?? '';
+        const nickname = String(meta.n || meta.nickname || lowerKey || '').trim();
+        const rawId = meta.id ?? meta.i ?? (typeof value === 'string' ? value : lowerKey) ?? '';
         const id = String(rawId).trim();
-        const follower = Number.isFinite(Number(meta.f)) ? Number(meta.f) : null;
-        const following = Number.isFinite(Number(meta.g)) ? Number(meta.g) : null;
-        const created = meta.c || null;
-        const updated = meta.u || null;
+        const follower = parseEnt2NullableCount(meta.fr ?? meta.f);
+        const following = parseEnt2NullableCount(meta.fg ?? meta.g);
+        const created = meta.c || meta.created || null;
+        const updated = meta.lu || meta.u || meta.lastUpdated || null;
+        const profilePath = meta.pi ?? meta.profileImage ?? null;
         const profileFile = String(meta.p || '').trim();
         const profileType = String(meta.t || '').trim();
-        const profileImage = profileFile ? { filename: profileFile, imageType: profileType || 'png' } : null;
+        const profileImage = profilePath
+          ? normalizeEnt2StoredProfileImage(profilePath)
+          : profileFile ? { filename: profileFile, imageType: profileType || 'png' } : null;
         return {
           nickname,
           id,
@@ -538,7 +596,7 @@ function buildEnt2DataIndex(data) {
   ent2DataEntries = [];
   const list = Array.isArray(data) ? data : Object.values(data || {});
   for (const user of list) {
-    const nickname = user && (user.nickname || user.name || user.displayName);
+    const nickname = user && (user.nickname || user.n || user.name || user.displayName);
     const id = user && (user.id || user._id || user.userId || user.user_id);
     if (!nickname || !id) continue;
 
@@ -546,11 +604,11 @@ function buildEnt2DataIndex(data) {
       nickname: String(nickname),
       id: String(id),
       lower: String(nickname).toLowerCase(),
-      follower: Number.isFinite(Number(user.follower)) ? Number(user.follower) : null,
-      following: Number.isFinite(Number(user.following)) ? Number(user.following) : null,
-      created: user.created || user.createdAt || user.joinedAt || null,
-      profileImage: user.profileImage || user.avatar || user.profile_image || null,
-      updated: user.updated || user.lastUpdated || null
+      follower: parseEnt2NullableCount(user.follower ?? user.fr),
+      following: parseEnt2NullableCount(user.following ?? user.fg),
+      created: user.created || user.createdAt || user.joinedAt || user.c || null,
+      profileImage: normalizeEnt2StoredProfileImage(user.profileImage || user.avatar || user.profile_image || user.pi),
+      updated: user.updated || user.lastUpdated || user.lu || null
     };
 
     ent2DataJsonLowerMap.set(normalized.lower, { originalKey: normalized.nickname, id: normalized.id, ...normalized });
@@ -566,17 +624,19 @@ async function loadEnt2ChunkUsers(base, file) {
   const users = [];
   for (const key in raw) {
     const user = raw[key];
-    if (!user || typeof user.nickname !== 'string' || !user.nickname) continue;
+    if (!user || typeof user !== 'object') continue;
+    const nickname = user.nickname || user.n;
+    if (typeof nickname !== 'string' || !nickname) continue;
     users.push({
       id: String(user.id || key),
-      nickname: user.nickname,
-      name: user.nickname,
-      lower: user.nickname.toLowerCase(),
-      follower: Number.isFinite(Number(user.follower)) ? Number(user.follower) : null,
-      following: Number.isFinite(Number(user.following)) ? Number(user.following) : null,
-      created: user.created || user.createdAt || user.joinedAt || null,
-      profileImage: user.profileImage || user.avatar || user.profile_image || null,
-      updated: user.updated || user.lastUpdated || null
+      nickname,
+      name: nickname,
+      lower: nickname.toLowerCase(),
+      follower: parseEnt2NullableCount(user.follower ?? user.fr),
+      following: parseEnt2NullableCount(user.following ?? user.fg),
+      created: user.created || user.createdAt || user.joinedAt || user.c || null,
+      profileImage: normalizeEnt2StoredProfileImage(user.profileImage || user.avatar || user.profile_image || user.pi),
+      updated: user.updated || user.lastUpdated || user.lu || null
     });
   }
   return users;
@@ -657,7 +717,13 @@ async function getOrFetchEnt2DataJson(onProgress, forceRefresh = false) {
     }
   }
 
-  if (ent2DbLoadingPromise && !forceRefresh) return ent2DbLoadingPromise;
+  if (ent2DbLoadingPromise && !forceRefresh) {
+    const result = await ent2DbLoadingPromise;
+    if (ent2DataEntries && ent2DataEntries.length > 0) {
+      notify(`DB 준비 완료 (${ent2DataEntries.length.toLocaleString()}명)`, 100, true);
+    }
+    return result;
+  }
 
   ent2DbLoadingPromise = (async () => {
     const base = 'https://raw.githubusercontent.com/ddot103/Entryuser/refs/heads/main/files/';
@@ -951,7 +1017,7 @@ async function performEnt2UserSearch(queryTerm) {
 function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
   if (!container) return;
   container.innerHTML = `
-    <div style="background:${isDark ? '#171b23' : '#ffffff'}; border:1px solid ${isDark ? 'rgba(148,163,184,0.14)' : '#dfe7f5'}; border-radius:24px; box-shadow:0 18px 42px rgba(15,23,42,0.08); padding:20px;">
+    <div class="ent2-page-card" style="padding:20px;">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
         <div>
           <div style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:${isDark ? '#93c5fd' : '#5b6dba'}; font-weight:800; margin-bottom:4px;">Search</div>
@@ -960,7 +1026,7 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
       </div>
 
       <div id="ent2-user-index-status-wrap">
-        <div id="ent2-user-index-status" style="margin-bottom:12px; padding:12px 14px; border:1px solid ${isDark ? 'rgba(148,163,184,0.14)' : '#e5edf8'}; border-radius:14px; background:${isDark ? '#101827' : '#f8fbff'};">
+        <div id="ent2-user-index-status" style="margin-bottom:12px; padding:12px 14px; border:1px solid ${isDark ? 'rgba(148,163,184,0.14)' : '#e5edf8'}; border-radius:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; font-size:11px; color:${isDark ? '#dbeafe' : '#475569'}; font-weight:700;">
             <span>데이터 인덱스</span>
             <div style="display:flex; align-items:center; gap:6px;">
@@ -968,21 +1034,21 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
               <button id="ent2-user-index-close-btn" type="button" style="border:none; background:transparent; color:${isDark ? '#cbd5e1' : '#64748b'}; font-size:11px; font-weight:800; cursor:pointer; padding:0;">닫기</button>
             </div>
           </div>
-          <div style="height:6px; background:${isDark ? '#1f2937' : '#e5edf8'}; border-radius:999px; overflow:hidden;">
+          <div class="ent2-user-index-track" style="height:6px; background:${isDark ? '#1f2937' : '#e5edf8'}; border-radius:999px; overflow:hidden;">
             <div id="ent2-user-index-progress" style="height:100%; width:0%; background:linear-gradient(90deg, #3b82f6, #60a5fa); border-radius:999px; transition:width 0.2s ease;"></div>
           </div>
           <div id="ent2-user-index-text" style="margin-top:8px; font-size:11.5px; color:${isDark ? '#cbd5e1' : '#64748b'};">인덱스 로딩 중...</div>
         </div>
       </div>
 
-      <button id="ent2-user-index-reopen-btn" type="button" style="display:none; margin-bottom:12px; border:1px dashed ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}; background:${isDark ? '#101827' : '#f8fbff'}; color:${isDark ? '#dbeafe' : '#475569'}; border-radius:10px; padding:8px 12px; font-size:11px; font-weight:700; cursor:pointer;">데이터 인덱스 열기</button>
+      <button id="ent2-user-index-reopen-btn" type="button" style="display:none; margin-bottom:12px; border:1px dashed ${isDark ? 'rgba(148,163,184,0.2)' : '#cbd5e1'}; color:${isDark ? '#dbeafe' : '#475569'}; border-radius:10px; padding:8px 12px; font-size:11px; font-weight:700; cursor:pointer;">데이터 인덱스 열기</button>
 
       <div style="position:relative;">
-        <input id="ent2-user-search-input" type="text" placeholder="닉네임 또는 24자리 ID 검색" autocomplete="off" style="width:100%; padding:16px 118px 16px 16px; border-radius:16px; border:2px solid #4f7cff; background:${isDark ? '#101827' : '#f8fbff'}; color:${isDark ? '#f2f4f6' : '#111827'}; font-size:14.5px; font-weight:600; box-sizing:border-box; outline:none; box-shadow:0 12px 24px rgba(79,124,255,0.10);">
+        <input id="ent2-user-search-input" type="text" placeholder="닉네임 또는 24자리 ID 검색" autocomplete="off" style="width:100%; padding:16px 118px 16px 16px; border-radius:16px; border:2px solid #4f7cff; font-size:14.5px; font-weight:600; box-sizing:border-box; outline:none; box-shadow:0 12px 24px rgba(79,124,255,0.10);">
         <button id="ent2-user-search-btn" type="button" style="position:absolute; right:8px; top:8px; bottom:8px; padding:0 18px; background:#3182f6; color:#fff; border:none; border-radius:12px; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 8px 18px rgba(49,130,246,0.28);">검색</button>
       </div>
 
-      <div id="ent2-autocomplete-box" style="display:none; margin-top:12px; border:1px solid ${isDark ? 'rgba(148,163,184,0.14)' : '#e5edf8'}; border-radius:16px; overflow:hidden; background:${isDark ? '#111827' : '#ffffff'}; max-height:320px; overflow-y:auto; box-shadow:0 14px 28px rgba(15,23,42,0.08);"></div>
+      <div id="ent2-autocomplete-box" style="display:none; margin-top:12px; border:1px solid ${isDark ? 'rgba(148,163,184,0.14)' : '#e5edf8'}; border-radius:16px; overflow:hidden; max-height:320px; overflow-y:auto; box-shadow:0 14px 28px rgba(15,23,42,0.08);"></div>
       <div id="ent2-profile-display-area" style="margin-top:14px;"></div>
     </div>
   `;
@@ -1002,18 +1068,22 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
     if (indexStatusWrap) indexStatusWrap.style.display = visible ? 'block' : 'none';
     if (reopenBtn) reopenBtn.style.display = visible ? 'none' : 'inline-block';
   };
+  setIndexPanelVisible(!hasEnt2UserIndexInitialized());
 
   const updateIndexStatus = (message = '인덱스 로딩 중...', percent = 0, ready = false) => {
     if (stateEl) {
       stateEl.textContent = ready ? '준비 완료' : '준비 중';
-      stateEl.style.color = ready ? '#22c55e' : '#3182f6';
+      stateEl.style.color = isDark ? '#32d27d' : (ready ? '#22c55e' : '#3182f6');
     }
     if (progressEl) progressEl.style.width = `${Math.max(0, Math.min(100, percent))}%`;
     if (textEl) textEl.textContent = message;
   };
 
   if (closeBtn) {
-    closeBtn.addEventListener('click', () => setIndexPanelVisible(false));
+    closeBtn.addEventListener('click', () => {
+      markEnt2UserIndexInitialized();
+      setIndexPanelVisible(false);
+    });
   }
   if (reopenBtn) {
     reopenBtn.addEventListener('click', () => setIndexPanelVisible(true));
@@ -1026,6 +1096,7 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
 
     const nextPercent = typeof info.percent === 'number' ? info.percent : (info.ready ? 100 : 64);
     updateIndexStatus(info.message || '인덱스 로딩 중...', nextPercent, !!info.ready);
+    if (info.ready) markEnt2UserIndexInitialized();
   };
 
   updateIndexStatus('인덱스 로딩 중...', 8, false);
@@ -1075,7 +1146,7 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
 
     if (localMatches.length > 0) {
       const headerHtml = `
-        <div style="padding:10px 16px; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; border-bottom:1px solid ${isDark ? '#2a3749' : '#e2e8f0'}; background:${isDark ? '#1a2332' : '#f8fafc'}; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);">
+        <div style="padding:10px 16px; font-size:11px; font-weight:700; color:${isDark ? '#a4a6ad' : '#64748b'}; border-bottom:1px solid ${isDark ? '#414248' : '#e2e8f0'}; background:${isDark ? '#323339' : '#f8fafc'}; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; backdrop-filter:blur(8px);">
           <span>실시간 검색 미리보기 (${localMatches.length}개)</span>
           <span style="font-size:10px; color:${isDark ? '#64748b' : '#94a3b8'};">1.시작 / 2.포함</span>
         </div>
@@ -1088,11 +1159,11 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
         else if (u.matchType === 'prefix') matchBadge = '<span style="font-size:10px; background:rgba(0,122,255,0.15); color:#007aff; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:700;">시작</span>';
 
         return `
-          <div class="ent2-auto-item" data-id="${escapeHtml(u.id)}" data-nickname="${escapeHtml(u.nickname || '')}" data-avatar="${escapeHtml(avatarUrl)}" style="padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; transition:background 0.15s; border-bottom:1px solid ${isDark ? '#2a3749' : '#f1f5f9'};">
+          <div class="ent2-auto-item" data-id="${escapeHtml(u.id)}" data-nickname="${escapeHtml(u.nickname || '')}" data-avatar="${escapeHtml(avatarUrl)}" style="padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; transition:background 0.15s; border-bottom:1px solid ${isDark ? '#414248' : '#f1f5f9'};">
             <div style="display:flex; align-items:center; gap:12px; overflow:hidden;">
-              <img src="${escapeHtml(avatarUrl)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid ${isDark ? '#334155' : '#e2e8f0'};" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
+              <img src="${escapeHtml(avatarUrl)}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; border:1px solid ${isDark ? '#414248' : '#e2e8f0'};" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
               <div style="overflow:hidden;">
-                <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#0f172a'}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center;">
+                <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#2c2d32'}; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center;">
                   <span>${escapeHtml(u.nickname)}</span>${matchBadge}
                 </div>
                 <div style="font-size:11px; color:${isDark ? '#94a3b8' : '#64748b'}; margin-top:2px;">ID: ${escapeHtml(u.id)}</div>
@@ -1108,7 +1179,7 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
 
       box.innerHTML = headerHtml + itemsHtml;
       box.querySelectorAll('.ent2-auto-item').forEach((item) => {
-        item.addEventListener('mouseenter', () => { item.style.background = isDark ? '#0f172a' : '#f8fafc'; });
+        item.addEventListener('mouseenter', () => { item.style.background = isDark ? '#414248' : '#f8fafc'; });
         item.addEventListener('mouseleave', () => { item.style.background = 'transparent'; });
         item.addEventListener('click', () => {
           const id = item.getAttribute('data-id');
@@ -1158,7 +1229,7 @@ function renderEnt2UserSearchTab(container, isDark, profileIdParam, navTo) {
       box.innerHTML = userList.map((u) => `
         <div class="ent2-auto-item" data-id="${escapeHtml(u.id)}" data-nickname="${escapeHtml(u.nickname || '')}" style="padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer;">
           <div>
-            <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(u.nickname || '익명')}</div>
+            <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(u.nickname || '익명')}</div>
             <div style="font-size:11px; color:${isDark ? '#94a3b8' : '#64748b'};">ID: ${escapeHtml(u.id)}</div>
           </div>
           <span style="font-size:11.5px; font-weight:700; color:#007aff; background:rgba(0,122,255,0.1); padding:4px 12px; border-radius:8px; display:inline-flex; align-items:center; gap:4px;">

@@ -1,4 +1,4 @@
-// ent2 Project Explore & Search Module (작품 탐색)
+﻿// ent2 Project Explore & Search Module (작품 탐색)
 
 function getEntryProjectImageUrl(p) {
     if (!p) return 'https://playentry.org/img/DefaultCardUserThmb.svg';
@@ -46,6 +46,13 @@ var ent2ProjectState = {
     loading: false,
     hasMore: false,
     error: null
+};
+
+const ENT2_PROJECT_PRESET_STYLES = {
+    popular: { background: '#008EFF', color: '#ffffff', shadow: 'rgba(0,142,255,.24)' },
+    staff: { background: '#FF4320', color: '#ffffff', shadow: 'rgba(255,67,32,.24)' },
+    following: { background: '#32D27D', color: '#1b2b21', shadow: 'rgba(50,210,125,.22)' },
+    all: { background: '#32D27D', color: '#1b2b21', shadow: 'rgba(50,210,125,.22)' }
 };
 
 async function fetchEnt2Projects(isMore = false) {
@@ -479,7 +486,7 @@ async function renderEnt2ProjectExploreTab(container, isDark, navTo) {
     container.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:20px;">
             <!-- Top Card Header -->
-            <div style="background:${isDark ? '#19191d' : '#ffffff'}; border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}; border-radius:24px; padding:24px; box-shadow:0 8px 30px rgba(0,0,0,0.04); display:flex; flex-direction:column; gap:18px;">
+            <div class="ent2-page-card" style="padding:24px; display:flex; flex-direction:column; gap:18px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
                     <div>
                         <h2 style="font-size:20px; font-weight:800; margin:0 0 4px 0; color:${isDark ? '#f2f4f6' : '#191f28'}; display:flex; align-items:center; gap:8px;">
@@ -495,10 +502,10 @@ async function renderEnt2ProjectExploreTab(container, isDark, navTo) {
 
                     <!-- Preset Tabs -->
                     <div style="display:flex; gap:6px; background:${isDark ? '#101013' : '#f2f4f6'}; padding:4px; border-radius:16px; border:1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'};">
-                        <button data-preset="popular" class="ent2-proj-preset-btn" style="padding:8px 14px; border-radius:12px; border:none; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">인기작품 (인작)</button>
-                        <button data-preset="staff" class="ent2-proj-preset-btn" style="padding:8px 14px; border-radius:12px; border:none; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">스태프선정 (스선)</button>
-                        <button data-preset="following" class="ent2-proj-preset-btn" style="padding:8px 14px; border-radius:12px; border:none; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">팔로잉 회원</button>
-                        <button data-preset="all" class="ent2-proj-preset-btn" style="padding:8px 14px; border-radius:12px; border:none; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">모든 작품</button>
+                        <button data-preset="popular" class="ent2-proj-preset-btn" aria-pressed="false" style="padding:8px 14px; border-radius:12px; border:1px solid transparent; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">인기작품 (인작)</button>
+                        <button data-preset="staff" class="ent2-proj-preset-btn" aria-pressed="false" style="padding:8px 14px; border-radius:12px; border:1px solid transparent; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">스태프선정 (스선)</button>
+                        <button data-preset="following" class="ent2-proj-preset-btn" aria-pressed="false" style="padding:8px 14px; border-radius:12px; border:1px solid transparent; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">팔로잉 회원</button>
+                        <button data-preset="all" class="ent2-proj-preset-btn" aria-pressed="false" style="padding:8px 14px; border-radius:12px; border:1px solid transparent; font-size:12.5px; font-weight:800; cursor:pointer; transition:all 0.2s;">모든 작품</button>
                     </div>
                 </div>
 
@@ -616,8 +623,12 @@ async function renderEnt2ProjectExploreTab(container, isDark, navTo) {
         container.querySelectorAll('.ent2-proj-preset-btn').forEach(btn => {
             const p = btn.getAttribute('data-preset');
             const active = ent2ProjectState.preset === p;
-            btn.style.background = active ? '#3182f6' : 'transparent';
-            btn.style.color = active ? '#ffffff' : (isDark ? '#8b95a1' : '#6b7684');
+            const presetStyle = ENT2_PROJECT_PRESET_STYLES[p];
+            btn.setAttribute('aria-pressed', String(active));
+            btn.style.background = active && presetStyle ? presetStyle.background : 'transparent';
+            btn.style.color = active && presetStyle ? presetStyle.color : (isDark ? '#a4a6ad' : '#6b7684');
+            btn.style.borderColor = active ? 'transparent' : 'var(--ent2-line, transparent)';
+            btn.style.boxShadow = active && presetStyle ? `0 5px 14px ${presetStyle.shadow}` : 'none';
         });
     };
 
@@ -835,9 +846,9 @@ function computeProjSearchAfterTimestamp(term, selectedDate) {
                 const createdDate = p.created ? new Date(p.created).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '';
 
                 return `
-                    <div class="ent2-proj-card" data-proj-id="${p.id}" data-proj-idx="${idx}" style="background:${isDark ? '#1a2234' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, box-shadow 0.2s ease; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 24px rgba(15,23,42,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.02)';">
+                    <div class="ent2-proj-card" data-proj-id="${p.id}" data-proj-idx="${idx}" style="background:${isDark ? '#414248' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s ease, box-shadow 0.2s ease; cursor:pointer; box-shadow:0 4px 12px rgba(0,0,0,0.02);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 24px rgba(15,23,42,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.02)';">
                         <div>
-                            <div class="ent2-proj-thumb-wrap" style="position:relative; width:100%; aspect-ratio:16/9; min-height:150px; background:#0f172a; overflow:hidden;">
+                            <div class="ent2-proj-thumb-wrap" style="position:relative; width:100%; aspect-ratio:16/9; min-height:150px; background:#2c2d32; overflow:hidden;">
                                 <img src="${thumbUrl}" style="width:100%; height:100%; object-fit:cover; display:block;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                                 <div style="position:absolute; top:8px; left:8px; display:flex; gap:4px; flex-wrap:wrap; z-index:2;">
                                     ${badgesHtml}
@@ -847,7 +858,7 @@ function computeProjSearchAfterTimestamp(term, selectedDate) {
                                 </button>
                             </div>
                             <div style="padding:10px 12px;">
-                                <div class="ent2-proj-title" style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'}; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                <div class="ent2-proj-title" style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'}; margin-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                     ${escapeHtml(p.name || '무제')}
                                 </div>
                                 <a href="${authorProfileUrl}" class="ent2-proj-author-link" data-author-id="${author.id}" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
@@ -859,7 +870,7 @@ function computeProjSearchAfterTimestamp(term, selectedDate) {
                             </div>
                         </div>
 
-                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
+                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#414248' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
                             <span>조회 ${(p.visit || 0).toLocaleString()}</span>
                             <button class="ent2-proj-like-btn" data-pid="${p.id}" title="좋아요 목록 보기" style="border:none; background:transparent; padding:0; cursor:pointer; color:inherit; font-size:inherit; font-weight:inherit; display:inline-flex; align-items:center; gap:2px;">
                                 좋아요 ${(p.likeCnt || 0).toLocaleString()}
@@ -1101,7 +1112,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
     const modalBox = document.createElement('div');
     modalBox.id = 'ent2-project-analysis-modal-box';
     modalBox.style.cssText = `
-        background: ${isDark ? '#101013' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#0f172a'};
+        background: ${isDark ? '#101013' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#2c2d32'};
         border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 24px;
         width: 1000px; max-width: 95vw; height: 90vh; max-height: 940px;
         display: flex; flex-direction: column; overflow: hidden;
@@ -1117,12 +1128,12 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                 <span style="font-size: 11px; font-weight: 800; color: #4f7cff; background: rgba(79, 124, 255, 0.12); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(79, 124, 255, 0.25); white-space: nowrap;">
                     ent2 작품 정밀 분석
                 </span>
-                <span id="ent2-proj-modal-title" style="font-size: 14.5px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span id="ent2-proj-modal-title" style="font-size: 14.5px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                     불러오는 중...
                 </span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                <button id="ent2-proj-fullscreen-btn" style="border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" title="전체화면 토글">
+                <button id="ent2-proj-fullscreen-btn" style="border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#2c2d32'}; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" title="전체화면 토글">
                     <svg id="ent2-proj-fs-icon-expand" style="width: 15px; height: 15px; color: #3182f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                     <svg id="ent2-proj-fs-icon-compress" style="width: 15px; height: 15px; color: #4f7cff; display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 14l-5 5m0 0h4m-4 0v-4m11 5l5-5m0 0v4m0-4h-4M9 10L4 5m0 0v4m0-4h4m11 0l5 5m0 0h-4m4 0V5"/></svg>
                     <span id="ent2-proj-fs-label">전체화면</span>
@@ -1346,7 +1357,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                         </span>
                     </div>
 
-                    <h2 style="margin: 0 0 8px 0; font-size: 19px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'}; line-height: 1.35;">
+                    <h2 style="margin: 0 0 8px 0; font-size: 19px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'}; line-height: 1.35;">
                         ${escapeHtml(project.name)}
                     </h2>
 
@@ -1354,7 +1365,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <img src="${authorImg}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'};" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                         <div>
-                            <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                            <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                 ${escapeHtml(author.nickname || '익명')}
                             </span>
                             ${author.role ? `<span style="font-size: 10px; font-weight: 700; color: #4f7cff; background: rgba(79,124,255,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 4px;">${escapeHtml(author.role)}</span>` : ''}
@@ -1375,10 +1386,10 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                     <a href="https://playentry.org/ws/${project.id}" target="_blank" rel="noopener noreferrer" style="padding: 7px 12px; background: #4f7cff; color: #ffffff; border-radius: 8px; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
                         <span>코드 보기</span>
                     </a>
-                    <a href="${thumbUrl}" target="_blank" rel="noopener noreferrer" style="padding: 7px 12px; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; border-radius: 8px; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                    <a href="${thumbUrl}" target="_blank" rel="noopener noreferrer" style="padding: 7px 12px; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#2c2d32'}; border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; border-radius: 8px; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
                         <span>썸네일 원본</span>
                     </a>
-                    <button id="ent2-proj-copy-json-btn" style="padding: 7px 12px; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
+                    <button id="ent2-proj-copy-json-btn" style="padding: 7px 12px; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#2c2d32'}; border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
                         <span>JSON 다운로드</span>
                     </button>
                     ${project.shortenUrl ? `
@@ -1577,7 +1588,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                         <div style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3); padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <span style="font-size: 11px; font-weight: 800; color: #8b5cf6;">리메이크 원본 작품</span>
-                                <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'}; margin-top: 2px;">
+                                <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'}; margin-top: 2px;">
                                     ${escapeHtml(project.parent.name || '원본 작품')} (작성자: ${escapeHtml(project.parent.user?.nickname || '익명')})
                                 </div>
                             </div>
@@ -1615,7 +1626,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
             tabContainer.innerHTML = `
                 <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             오브젝트 목록 (총 ${rawObjects.length}개)
                         </span>
                     </div>
@@ -1633,7 +1644,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                                             <span style="font-size: 11px; font-weight: 800; color: #3182f6; background: rgba(49,130,246,0.12); padding: 2px 7px; border-radius: 6px;">
                                                 #${i + 1}
                                             </span>
-                                            <span style="font-size: 14px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                                            <span style="font-size: 14px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                                 ${escapeHtml(obj.name || '오브젝트')}
                                             </span>
                                             <span style="font-size: 10px; font-weight: 700; color: ${isDark ? '#a1a1aa' : '#71717a'}; background: ${isDark ? '#18181b' : '#f1f5f9'}; padding: 2px 6px; border-radius: 4px;">
@@ -1696,7 +1707,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
         } else if (tabKey === 'variables') {
             tabContainer.innerHTML = `
                 <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
-                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                         변수 및 리스트 (총 ${rawVariables.length}개)
                     </div>
 
@@ -1707,7 +1718,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                             return `
                                 <div style="background: ${isDark ? '#27272a' : '#ffffff'}; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px;">
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-                                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                             ${escapeHtml(v.name || '변수')}
                                         </span>
                                         <span style="font-size: 10px; font-weight: 800; color: ${isList ? '#8b5cf6' : '#3182f6'}; background: ${isList ? 'rgba(139,92,246,0.12)' : 'rgba(49,130,246,0.12)'}; padding: 2px 6px; border-radius: 4px;">
@@ -1734,13 +1745,13 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
                     <!-- Messages -->
                     <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             신호(메시지) 목록 (${rawMessages.length}개)
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${rawMessages.length > 0 ? rawMessages.map(m => `
                                 <div style="background: ${isDark ? '#27272a' : '#ffffff'}; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(m.name || '신호')}</span>
+                                    <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(m.name || '신호')}</span>
                                     <code style="font-size: 10px; color: #3182f6;">${m.id || ''}</code>
                                 </div>
                             `).join('') : `
@@ -1751,13 +1762,13 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
 
                     <!-- Functions -->
                     <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             함수(커스텀 블록) 목록 (${rawFunctions.length}개)
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${rawFunctions.length > 0 ? rawFunctions.map(f => `
                                 <div style="background: ${isDark ? '#27272a' : '#ffffff'}; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(f.name || '함수')}</span>
+                                    <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(f.name || '함수')}</span>
                                     <code style="font-size: 10px; color: #4f7cff;">${f.id || ''}</code>
                                 </div>
                             `).join('') : `
@@ -1772,13 +1783,13 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
                     <!-- Scenes -->
                     <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             장면 목록 (${rawScenes.length}개)
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${rawScenes.length > 0 ? rawScenes.map((sc, i) => `
                                 <div style="background: ${isDark ? '#27272a' : '#ffffff'}; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}; padding: 10px 14px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">장면 ${i + 1}: ${escapeHtml(sc.name || '장면')}</span>
+                                    <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">장면 ${i + 1}: ${escapeHtml(sc.name || '장면')}</span>
                                     <code style="font-size: 10px; color: #3182f6;">${sc.id || ''}</code>
                                 </div>
                             `).join('') : `
@@ -1789,13 +1800,13 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
 
                     <!-- Tables -->
                     <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             데이터 테이블 (${rawTables.length}개)
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 6px;">
                             ${rawTables.length > 0 ? rawTables.map(tb => `
                                 <div style="background: ${isDark ? '#27272a' : '#ffffff'}; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}; padding: 10px 14px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(tb.name || '테이블')}</span>
+                                    <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(tb.name || '테이블')}</span>
                                     <code style="font-size: 10px; color: #4f7cff;">${tb.id || ''}</code>
                                 </div>
                             `).join('') : `
@@ -1808,28 +1819,28 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
         } else if (tabKey === 'ai') {
             tabContainer.innerHTML = `
                 <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 14px;">
-                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                         인공지능 & 확장 & 하드웨어 블록
                     </div>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
                         <div style="background: ${isDark ? '#27272a' : '#ffffff'}; padding: 14px; border-radius: 12px; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'};">
                             <div style="font-size: 12px; font-weight: 800; color: #3182f6; margin-bottom: 6px;">인공지능 블록 (AI)</div>
-                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                 ${Array.isArray(project.aiUtilizeBlocks) && project.aiUtilizeBlocks.length > 0 ? project.aiUtilizeBlocks.join(', ') : '사용 안 함'}
                             </div>
                         </div>
 
                         <div style="background: ${isDark ? '#27272a' : '#ffffff'}; padding: 14px; border-radius: 12px; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'};">
                             <div style="font-size: 12px; font-weight: 800; color: #4f7cff; margin-bottom: 6px;">확장 블록 (Expansion)</div>
-                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                 ${Array.isArray(project.expansionBlocks) && project.expansionBlocks.length > 0 ? project.expansionBlocks.join(', ') : '사용 안 함'}
                             </div>
                         </div>
 
                         <div style="background: ${isDark ? '#27272a' : '#ffffff'}; padding: 14px; border-radius: 12px; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'};">
                             <div style="font-size: 12px; font-weight: 800; color: #f59e0b; margin-bottom: 6px;">하드웨어 블록 (Hardware)</div>
-                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                            <div style="font-size: 13px; font-weight: 600; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                 ${Array.isArray(project.hardwareLiteBlocks) && project.hardwareLiteBlocks.length > 0 ? project.hardwareLiteBlocks.join(', ') : '사용 안 함'}
                             </div>
                         </div>
@@ -1840,7 +1851,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
             tabContainer.innerHTML = `
                 <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                        <span style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                             작품 댓글 (${commentsTotal}개)
                         </span>
                     </div>
@@ -1861,7 +1872,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <img src="${cuImg}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
-                                            <a href="https://playentry.org/profile/${cu.id || ''}" target="_blank" rel="noopener noreferrer" style="font-size: 12.5px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'}; text-decoration: none;">
+                                            <a href="https://playentry.org/profile/${cu.id || ''}" target="_blank" rel="noopener noreferrer" style="font-size: 12.5px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'}; text-decoration: none;">
                                                 ${escapeHtml(cu.nickname || '익명')}
                                             </a>
                                             ${cu.role ? `<span style="font-size: 9px; font-weight: 700; color: #4f7cff; background: rgba(79,124,255,0.12); padding: 1px 5px; border-radius: 4px;">${escapeHtml(cu.role)}</span>` : ''}
@@ -1896,7 +1907,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
         } else if (tabKey === 'likes') {
             tabContainer.innerHTML = `
                 <div style="background: ${isDark ? '#18181b' : '#f8fafc'}; border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 12px;">
-                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                    <div style="font-size: 13px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                         좋아요 누른 유저 목록 (${likesTotal}명)
                     </div>
 
@@ -1912,7 +1923,7 @@ async function openEnt2ProjectAnalysisModal(projectOrId, isDark, initialTab = 'o
                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; background: ${isDark ? '#27272a' : '#ffffff'}; padding: 8px 12px; border-radius: 10px; border: 1px solid ${isDark ? '#3f3f46' : '#e4e4e7'};">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <img src="${uImg}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
-                                        <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                                        <span style="font-size: 12.5px; font-weight: 700; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                                             ${escapeHtml(u.nickname || '익명')}
                                         </span>
                                     </div>

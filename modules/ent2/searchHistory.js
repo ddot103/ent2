@@ -1,4 +1,4 @@
-// ent2 Search History Module
+﻿// ent2 Search History Module
 async function logEnt2SearchHistory(searchResult) {
     if (!searchResult || !searchResult.id) return;
     const history = await Ent2Storage.get('ent2_search_history', []);
@@ -23,7 +23,7 @@ async function renderEnt2SearchHistoryTab(container, isDark, navTo) {
     const svgClockIcon = `<svg style="width:20px; height:20px; color:#007aff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
 
     container.innerHTML = `
-        <div style="background:${isDark ? '#1e293b' : '#ffffff'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:24px; padding:32px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
+        <div class="ent2-page-card" style="padding:32px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
                 <div>
                     <h2 style="font-size:22px; font-weight:800; margin:0 0 6px 0; display:flex; align-items:center; gap:8px;">
@@ -62,11 +62,11 @@ async function renderEnt2SearchHistoryTab(container, isDark, navTo) {
         listArea.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:10px;">
                 ${history.map(item => `
-                    <div style="background:${isDark ? '#0f172a' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                    <div style="background:${isDark ? '#2c2d32' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
                         <div style="display:flex; align-items:center; gap:12px; overflow:hidden;">
                             <img src="${item.avatar || 'https://playentry.org/img/DefaultCardUserThmb.svg'}" style="width:38px; height:38px; border-radius:50%; object-fit:cover; flex-shrink:0;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                             <div style="overflow:hidden;">
-                                <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(item.nickname || item.query)}</div>
+                                <div style="font-size:14px; font-weight:700; color:${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(item.nickname || item.query)}</div>
                                 <div style="font-size:11px; font-family:monospace; color:${isDark ? '#94a3b8' : '#64748b'}; margin-top:2px;">ID: ${escapeHtml(item.profileId)} • ${new Date(item.timestamp).toLocaleString('ko-KR')}</div>
                             </div>
                         </div>

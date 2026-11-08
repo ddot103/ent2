@@ -1,4 +1,4 @@
-// ent2 Community Filter & Search Module
+﻿// ent2 Community Filter & Search Module
 if (typeof liteCommunityState === 'undefined') {
     var liteCommunityState = {
         category: 'all',
@@ -200,12 +200,12 @@ async function renderLiteCommunityFilterUI(container) {
 
     container.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:16px;">
-            <div style="background:linear-gradient(135deg, ${isDark ? '#111827' : '#f8fbff'} 0%, ${isDark ? '#171d23' : '#eef4ff'} 100%); border:1px solid ${isDark ? '#2b3037' : '#dfeafc'}; border-radius:22px; padding:16px 18px; box-shadow:0 12px 30px rgba(15,23,42,0.18);">
+            <div class="lite-comm-filter-panel" style="background:linear-gradient(135deg, ${isDark ? '#111827' : '#f8fbff'} 0%, ${isDark ? '#171d23' : '#eef4ff'} 100%); border:1px solid ${isDark ? '#2b3037' : '#dfeafc'}; border-radius:22px; padding:16px 18px; box-shadow:0 12px 30px rgba(15,23,42,0.18);">
                 <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:linear-gradient(135deg, #21262d, #2b3138); border-radius:12px; box-shadow:0 10px 24px rgba(15,23,42,0.18);">${svgZap}</span>
                         <div>
-                            <h3 style="margin:0; font-size:18px; font-weight:900; color:${isDark ? '#f8fafc' : '#0f172a'}; letter-spacing:-0.03em;">커뮤니티 탐색</h3>
+                            <h3 style="margin:0; font-size:18px; font-weight:900; color:${isDark ? '#f8fafc' : '#2c2d32'}; letter-spacing:-0.03em;">커뮤니티 탐색</h3>
                             <p style="margin:3px 0 0 0; font-size:11px; color:${isDark ? '#cbd5e1' : '#64748b'};">태그, 작성자, 정렬, 기간을 조합해서 원하는 게시글을 빠르게 찾습니다.</p>
                         </div>
                     </div>
@@ -220,25 +220,28 @@ async function renderLiteCommunityFilterUI(container) {
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+            <div class="lite-comm-controls-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
                 <div>
                     <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">검색 키워드</label>
-                    <input type="text" id="lite-comm-input-q" value="${escapeHtml(liteCommunityState.q)}" placeholder="제목 또는 본문 검색..." style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
+                    <input type="text" id="lite-comm-input-q" value="${escapeHtml(liteCommunityState.q)}" placeholder="제목 또는 본문 검색..." style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
                 </div>
 
                 <div>
-                    <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">작성자 ID</label>
-                    <input type="text" id="lite-comm-input-user" value="${escapeHtml(liteCommunityState.user)}" placeholder="작성자 고유 ID (예: 60a...)" style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
+                    <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">작성자 ID 또는 닉네임</label>
+                    <input type="text" id="lite-comm-input-user" value="${escapeHtml(liteCommunityState.user)}" placeholder="ID 일부 또는 닉네임 입력..." style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
                 </div>
 
                 <div>
-                    <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">해시태그</label>
-                    <input type="text" id="lite-comm-input-tag" value="${escapeHtml(liteCommunityState.tag)}" placeholder="태그 입력 (예: 하드웨어)..." style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
+                    <label for="lite-comm-input-tag" style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">태그 직접 입력</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="search" id="lite-comm-input-tag" value="${escapeHtml(liteCommunityState.tag)}" placeholder="태그 입력 (예: 하드웨어 또는 #하드웨어)" aria-label="탐색할 태그 직접 입력" style="flex:1; min-width:0; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
+                        <button id="lite-comm-tag-apply-btn" type="button" style="padding:0 12px; border:1px solid ${isDark ? '#414248' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#323339' : '#f1f5f9'}; color:${isDark ? '#f5f6f7' : '#334155'}; font-size:11px; font-weight:750; cursor:pointer; white-space:nowrap;">태그 적용</button>
+                    </div>
                 </div>
 
                 <div>
                     <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">정렬 기준</label>
-                    <select id="lite-comm-select-sort" style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box; cursor:pointer;">
+                    <select id="lite-comm-select-sort" style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box; cursor:pointer;">
                         <option value="created" ${liteCommunityState.sort === 'created' ? 'selected' : ''}>최신순</option>
                         <option value="visit" ${liteCommunityState.sort === 'visit' ? 'selected' : ''}>조회순</option>
                         <option value="likesLength" ${liteCommunityState.sort === 'likesLength' ? 'selected' : ''}>좋아요순</option>
@@ -256,7 +259,7 @@ async function renderLiteCommunityFilterUI(container) {
 
                 <div>
                     <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">탐색 시점 / 기간 범위 (시/일/월/년)</label>
-                    <select id="lite-comm-select-term" style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box; cursor:pointer;">
+                    <select id="lite-comm-select-term" style="width:100%; padding:10px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box; cursor:pointer;">
                         <option value="all" ${liteCommunityState.term === 'all' ? 'selected' : ''}>전체 기간</option>
                         <optgroup label="연도별 시점 탐색 (Year)">
                             <option value="year-2026" ${liteCommunityState.term === 'year-2026' ? 'selected' : ''}>2026년 기준 탐색</option>
@@ -281,10 +284,11 @@ async function renderLiteCommunityFilterUI(container) {
                 <div>
                     <label style="display:block; font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">정밀 시점 직접 지정 (년/월/일 searchAfter)</label>
                     <div style="display:flex; gap:6px; align-items:center;">
-                        <input type="date" id="lite-comm-input-date" value="${liteCommunityState.selectedDate ? liteCommunityState.selectedDate.slice(0, 10) : ''}" style="flex:1; padding:8px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
+                        <input type="date" id="lite-comm-input-date" value="${liteCommunityState.selectedDate ? liteCommunityState.selectedDate.slice(0, 10) : ''}" style="flex:1; padding:8px 12px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; border-radius:10px; background:${isDark ? '#1a1b1e' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; font-size:12px; font-weight:600; outline:none; box-sizing:border-box;">
                         <button id="lite-comm-clear-date-btn" type="button" style="padding:0 12px; height:36px; border-radius:10px; border:1px solid ${isDark ? '#33353a' : '#cbd5e1'}; background:${isDark ? '#2a2d32' : '#f1f5f9'}; color:${isDark ? '#94a3b8' : '#64748b'}; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">초기화</button>
                     </div>
                 </div>
+
             </div>
 
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:11px; color:${isDark ? '#94a3b8' : '#64748b'}; padding-top:4px;">
@@ -313,9 +317,9 @@ async function renderLiteCommunityFilterUI(container) {
             </div>
         </div>
 
-        <div id="lite-comm-results-area" style="margin-top:24px; display:none; border:1px solid ${isDark ? '#2f3749' : '#e7edf9'}; border-radius:22px; background:${isDark ? '#111827' : '#f8fbff'}; padding:18px; box-shadow:0 18px 36px rgba(15,23,42,0.05);">
+        <section id="lite-comm-results-area" aria-live="polite" style="margin-top:24px; display:none; border:1px solid ${isDark ? '#2f3749' : '#e7edf9'}; border-radius:22px; background:${isDark ? '#111827' : '#f8fbff'}; padding:18px; box-shadow:0 18px 36px rgba(15,23,42,0.05);">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:8px; flex-wrap:wrap;">
-                <h4 id="lite-comm-result-title" style="margin:0; font-size:15px; font-weight:900; color:${isDark ? '#f8fafc' : '#0f172a'};">
+                <h4 id="lite-comm-result-title" style="margin:0; font-size:15px; font-weight:900; color:${isDark ? '#f8fafc' : '#2c2d32'};">
                     검색 결과
                 </h4>
                 <div style="font-size:12px; color:${isDark ? '#cbd5e1' : '#64748b'}; background:${isDark ? '#1f2937' : '#edf3ff'}; border:1px solid ${isDark ? '#334155' : '#dfeafc'}; border-radius:999px; padding:5px 10px;" id="lite-comm-result-count"></div>
@@ -326,16 +330,16 @@ async function renderLiteCommunityFilterUI(container) {
 
             <div id="lite-comm-pagination" style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:24px;">
             </div>
-        </div>
+        </section>
     `;
 
     container.querySelectorAll('.lite-cat-btn').forEach(btn => {
-        btn.onclick = () => {
+        btn.onclick = async () => {
             liteCommunityState.category = btn.getAttribute('data-cat');
             liteCommunityState.page = 1;
             liteCommunityState.searchAfter = null;
             liteCommunityState.cursors = [null];
-            renderLiteCommunityFilterUI(container);
+            await renderLiteCommunityFilterUI(container);
             executeLiteCommunityQuery(container);
         };
     });
@@ -344,6 +348,9 @@ async function renderLiteCommunityFilterUI(container) {
         btn.onclick = () => {
             const tag = btn.getAttribute('data-quick-tag');
             liteCommunityState.tag = tag;
+            liteCommunityState.page = 1;
+            liteCommunityState.searchAfter = null;
+            liteCommunityState.cursors = [null];
             const inputTag = container.querySelector('#lite-comm-input-tag');
             if (inputTag) inputTag.value = tag;
             executeLiteCommunityQuery(container);
@@ -353,7 +360,7 @@ async function renderLiteCommunityFilterUI(container) {
     const runCommSearch = () => {
         liteCommunityState.q = container.querySelector('#lite-comm-input-q')?.value || '';
         liteCommunityState.user = container.querySelector('#lite-comm-input-user')?.value || '';
-        liteCommunityState.tag = container.querySelector('#lite-comm-input-tag')?.value || '';
+        liteCommunityState.tag = (container.querySelector('#lite-comm-input-tag')?.value || '').trim().replace(/^#/, '');
         liteCommunityState.sort = container.querySelector('#lite-comm-select-sort')?.value || 'created';
         liteCommunityState.term = container.querySelector('#lite-comm-select-term')?.value || 'all';
         liteCommunityState.page = 1;
@@ -387,6 +394,8 @@ async function renderLiteCommunityFilterUI(container) {
             if (e.key === 'Enter') runCommSearch();
         };
     }
+    const tagApplyBtn = container.querySelector('#lite-comm-tag-apply-btn');
+    if (tagApplyBtn) tagApplyBtn.onclick = runCommSearch;
 
     if (selectSort) {
         selectSort.onchange = () => runCommSearch();
@@ -423,7 +432,7 @@ async function renderLiteCommunityFilterUI(container) {
 
     const resetBtn = container.querySelector('#lite-comm-reset-btn');
     if (resetBtn) {
-        resetBtn.onclick = () => {
+        resetBtn.onclick = async () => {
             liteCommunityState = {
                 category: 'all',
                 q: '',
@@ -439,13 +448,11 @@ async function renderLiteCommunityFilterUI(container) {
                 searchAfter: null,
                 cursors: [null]
             };
-            renderLiteCommunityFilterUI(container);
+            await renderLiteCommunityFilterUI(container);
             executeLiteCommunityQuery(container);
         };
     }
 
-    // 커뮤니티 탐색 탭 진입 시 자동으로 게시글 목록 검색 실행
-    executeLiteCommunityQuery(container);
 }
 
 let joinedGroupIdsCache = null;
@@ -562,7 +569,9 @@ async function executeLiteCommunityQuery(container) {
     }
 
     if (liteCommunityState.q) vars.query = liteCommunityState.q;
-    if (liteCommunityState.user) vars.user = liteCommunityState.user;
+    if (liteCommunityState.user && /^[a-f0-9]{24}$/i.test(liteCommunityState.user.trim())) {
+        vars.user = liteCommunityState.user.trim();
+    }
     if (liteCommunityState.tag) vars.tag = liteCommunityState.tag;
 
     if (liteCommunityState.category && liteCommunityState.category !== 'all') {
@@ -637,6 +646,7 @@ async function executeLiteCommunityQuery(container) {
         const data = await res.json();
         const discussList = data?.data?.discussList;
         let posts = discussList?.list || [];
+        const fetchedPostCount = posts.length;
         let total = discussList?.total || 0;
         liteCommunityState.nextSearchAfter = discussList?.searchAfter || null;
 
@@ -676,7 +686,10 @@ async function executeLiteCommunityQuery(container) {
 
         if (liteCommunityState.selectedDate) {
             const dt = new Date(liteCommunityState.selectedDate).getTime();
-            if (!isNaN(dt)) minTimeBoundary = dt;
+            if (!isNaN(dt)) {
+                minTimeBoundary = dt;
+                maxTimeBoundary = dt + 24 * 60 * 60 * 1000 - 1;
+            }
         } else if (termVal && termVal.startsWith('year-')) {
             const y = parseInt(termVal.replace('year-', ''), 10);
             if (!isNaN(y)) {
@@ -708,6 +721,15 @@ async function executeLiteCommunityQuery(container) {
             });
         }
 
+        const authorFilter = String(liteCommunityState.user || '').trim().toLocaleLowerCase();
+        if (authorFilter) {
+            posts = posts.filter((post) => {
+                const author = post.user || {};
+                return String(author.id || '').toLocaleLowerCase().includes(authorFilter)
+                    || String(author.nickname || '').toLocaleLowerCase().includes(authorFilter);
+            });
+        }
+
         if (liteCommunityState.sort === 'oldest' && posts.length > 0) {
             posts.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime());
         } else if (liteCommunityState.sort === '-likesLength' && posts.length > 0) {
@@ -716,7 +738,7 @@ async function executeLiteCommunityQuery(container) {
             posts.sort((a, b) => (a.commentsLength || a.comment || 0) - (b.commentsLength || b.comment || 0));
         }
 
-        if (countEl) countEl.textContent = `총 ${total.toLocaleString()}개 게시글`;
+        if (countEl) countEl.textContent = `전체 ${total.toLocaleString()}개 · 현재 페이지 ${posts.length}개`;
 
         if (posts.length === 0) {
             cardsGrid.innerHTML = `
@@ -724,7 +746,34 @@ async function executeLiteCommunityQuery(container) {
                     필터 조건에 부합하는 게시글이 없습니다.
                 </div>
             `;
-            if (paginationEl) paginationEl.innerHTML = '';
+            if (paginationEl) {
+                paginationEl.innerHTML = `
+                    <button id="lite-comm-prev-page" type="button" ${liteCommunityState.page <= 1 ? 'disabled' : ''}>이전 페이지</button>
+                    <span style="font-size:12px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'};">${liteCommunityState.page} 페이지</span>
+                    <button id="lite-comm-next-page" type="button" ${!liteCommunityState.nextSearchAfter || fetchedPostCount < 12 ? 'disabled' : ''}>다음 페이지</button>
+                `;
+                const prevBtn = paginationEl.querySelector('#lite-comm-prev-page');
+                const nextBtn = paginationEl.querySelector('#lite-comm-next-page');
+                if (prevBtn) {
+                    prevBtn.onclick = () => {
+                        if (liteCommunityState.page > 1) {
+                            liteCommunityState.page--;
+                            liteCommunityState.searchAfter = liteCommunityState.cursors[liteCommunityState.page - 1] || null;
+                            executeLiteCommunityQuery(container);
+                        }
+                    };
+                }
+                if (nextBtn) {
+                    nextBtn.onclick = () => {
+                        if (liteCommunityState.nextSearchAfter) {
+                            liteCommunityState.page++;
+                            liteCommunityState.cursors[liteCommunityState.page - 1] = liteCommunityState.nextSearchAfter;
+                            liteCommunityState.searchAfter = liteCommunityState.nextSearchAfter;
+                            executeLiteCommunityQuery(container);
+                        }
+                    };
+                }
+            }
             return;
         }
 
@@ -763,12 +812,12 @@ async function executeLiteCommunityQuery(container) {
                     ? `<img src="https://playentry.org/uploads/${author.mark.filename.slice(0, 2)}/${author.mark.filename.slice(2, 4)}/${author.mark.filename}.${author.mark.imageType || 'svg'}" style="width:14px; height:14px; vertical-align:middle; margin-right:4px;">` 
                     : '';
 
-                const storyCardTone = isDark ? '#101827' : (isEntryStoryPost ? '#f5f7fa' : '#ffffff');
+                const storyCardTone = isDark ? '#323339' : (isEntryStoryPost ? '#f5f7fa' : '#ffffff');
                 const storyHeaderTone = isDark ? '#171d29' : (isEntryStoryPost ? '#ffffff' : '#f7f9fc');
                 const accentColor = '#4f7cff';
 
                 return `
-                    <div style="background:${storyCardTone}; border:1px solid ${isDark ? '#2d3748' : '#dfe8f3'}; border-radius:18px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; box-shadow:0 8px 18px rgba(15,23,42,0.12);">
+                    <article class="ent2-comm-result-card" style="background:${storyCardTone}; border:1px solid ${isDark ? '#2d3748' : '#dfe8f3'}; border-radius:18px; padding:14px; display:flex; flex-direction:column; justify-content:space-between; gap:12px; box-shadow:0 8px 18px rgba(15,23,42,0.12);">
                         <div style="padding:10px 12px; background:${storyHeaderTone}; border:1px solid ${isDark ? '#2b3344' : '#edf1f7'}; border-radius:12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
                             <span style="font-size:10.5px; font-weight:800; color:${accentColor}; background:rgba(79,124,255,0.12); padding:3px 8px; border-radius:999px; border:1px solid rgba(79,124,255,0.15);">
                                 ${escapeHtml(catName)}
@@ -785,7 +834,7 @@ async function executeLiteCommunityQuery(container) {
                         </div>
 
                         ${thumbnail ? `
-                            <div class="ent2-comm-card-thumb" data-post-idx="${idx}" style="width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:${isDark ? '#0f172a' : '#edf2f8'}; cursor:pointer; position:relative; border:1px solid ${isDark ? '#2d3748' : '#dfe8f3'};" title="이미지 미리보기 (클릭 시 상세보기)">
+                            <div class="ent2-comm-card-thumb" data-post-idx="${idx}" style="width:100%; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:${isDark ? '#2c2d32' : '#edf2f8'}; cursor:pointer; position:relative; border:1px solid ${isDark ? '#2d3748' : '#dfe8f3'};" title="이미지 미리보기 (클릭 시 상세보기)">
                                 <img src="${escapeHtml(thumbnail)}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.25s ease;" onerror="this.parentElement.style.display='none';" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                                 <span style="position:absolute; bottom:8px; right:8px; font-size:9.5px; font-weight:800; color:#ffffff; background:rgba(0,0,0,0.62); padding:2px 6px; border-radius:6px; backdrop-filter:blur(4px);">썸네일</span>
                             </div>
@@ -798,7 +847,7 @@ async function executeLiteCommunityQuery(container) {
                                     <span style="font-weight:800; font-size:11px; color:${isDark ? '#e5edf9' : '#1f2937'};">${escapeHtml(author.nickname || '익명')}</span>
                                     ${isEntryStoryPost ? `<span style="font-size:9px; font-weight:800; color:${accentColor}; background:rgba(79,124,255,0.1); border:1px solid rgba(79,124,255,0.15); padding:2px 6px; border-radius:999px;">엔트리 이야기</span>` : ''}
                                 </div>
-                                <a href="${postUrl}" class="ent2-comm-card-title" data-post-idx="${idx}" style="font-size:14px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'}; text-decoration:none; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-height:1.45; cursor:pointer;">
+                                <a href="${postUrl}" class="ent2-comm-card-title" data-post-idx="${idx}" style="font-size:14px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'}; text-decoration:none; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-height:1.45; cursor:pointer;">
                                     ${escapeHtml(displayText)}
                                 </a>
                             </div>
@@ -816,7 +865,7 @@ async function executeLiteCommunityQuery(container) {
                             </div>
                             ${markHtml ? `<span style="display:inline-flex; align-items:center; gap:4px; color:${isDark ? '#dfeaf5' : '#33353a'}; font-size:11px; font-weight:700;">${markHtml}</span>` : ''}
                         </div>
-                    </div>
+                    </article>
                 `;
             }).join('');
 
@@ -878,14 +927,14 @@ async function executeLiteCommunityQuery(container) {
 
         if (paginationEl) {
             paginationEl.innerHTML = `
-                <button id="lite-comm-prev-page" style="padding:8px 16px; background:${isDark ? '#334155' : '#f1f5f9'}; color:${isDark ? '#f8fafc' : '#0f172a'}; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" ${liteCommunityState.page <= 1 ? 'disabled' : ''}>
+                <button id="lite-comm-prev-page" style="padding:8px 16px; background:${isDark ? '#334155' : '#f1f5f9'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" ${liteCommunityState.page <= 1 ? 'disabled' : ''}>
                     <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     <span>이전 페이지</span>
                 </button>
-                <span style="font-size:12px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'};">
+                <span style="font-size:12px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'};">
                     ${liteCommunityState.page} 페이지
                 </span>
-                <button id="lite-comm-next-page" style="padding:8px 16px; background:${isDark ? '#334155' : '#f1f5f9'}; color:${isDark ? '#f8fafc' : '#0f172a'}; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" ${!liteCommunityState.nextSearchAfter || posts.length < 12 ? 'disabled' : ''}>
+                <button id="lite-comm-next-page" style="padding:8px 16px; background:${isDark ? '#334155' : '#f1f5f9'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; border:none; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" ${!liteCommunityState.nextSearchAfter || fetchedPostCount < 12 ? 'disabled' : ''}>
                     <span>다음 페이지</span>
                     <svg style="width:12px; height:12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </button>
@@ -931,11 +980,7 @@ async function renderEnt2CommTab(container, isDark, navTo) {
         liteCommunityState.cursors = [null];
     }
 
-    container.innerHTML = `
-        <div style="background:${isDark ? '#1e293b' : '#ffffff'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:24px; padding:32px; box-shadow:0 10px 30px rgba(0,0,0,0.05);">
-            <div id="ent2-comm-filter-mount"></div>
-        </div>
-    `;
+    container.innerHTML = '<div id="ent2-comm-filter-mount"></div>';
 
     const mount = container.querySelector('#ent2-comm-filter-mount');
     await renderLiteCommunityFilterUI(mount);
@@ -1116,7 +1161,7 @@ async function openEnt2LikeListModal(targetId, targetSubject = 'discuss') {
     `;
 
     overlay.innerHTML = `
-        <div style="background:${isDark ? '#18181b' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#0f172a'}; border:1px solid ${isDark ? '#27272a' : '#e2e8f0'}; border-radius:40px; max-width:480px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+        <div style="background:${isDark ? '#18181b' : '#ffffff'}; color:${isDark ? '#f8fafc' : '#2c2d32'}; border:1px solid ${isDark ? '#27272a' : '#e2e8f0'}; border-radius:40px; max-width:480px; width:100%; max-height:85vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
             <!-- Modal Header (Matching SVG: 좋아요 3개) -->
             <div style="padding:24px 30px 18px 30px; display:flex; align-items:center; justify-content:space-between; gap:12px; background:${isDark ? '#18181b' : '#ffffff'};">
                 <div style="font-size:22px; font-weight:800; color:${isDark ? '#f8fafc' : '#000000'}; letter-spacing:-0.02em;">
@@ -1287,7 +1332,7 @@ async function loadEnt2CommentsForPost(postId, isDark) {
 
     if (list.length === 0) {
         box.innerHTML = `
-            <div style="text-align:center; padding:24px; color:${isDark ? '#94a3b8' : '#64748b'}; font-size:12.5px; font-weight:600; background:${isDark ? '#0f172a' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px;">
+            <div style="text-align:center; padding:24px; color:${isDark ? '#94a3b8' : '#64748b'}; font-size:12.5px; font-weight:600; background:${isDark ? '#2c2d32' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px;">
                 작성된 댓글이 없습니다.
             </div>
         `;
@@ -1329,12 +1374,12 @@ async function loadEnt2CommentsForPost(postId, isDark) {
             : `https://playentry.org/profile/${u.id}`;
 
         return `
-            <div style="padding:14px; background:${isDark ? '#0f172a' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px; display:flex; flex-direction:column; gap:8px;">
+            <div style="padding:14px; background:${isDark ? '#2c2d32' : '#f8fafc'}; border:1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius:14px; display:flex; flex-direction:column; gap:8px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <a href="${profileUrl}" class="ent2-comment-user-link" data-user-id="${u.id}" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
                         <img src="${avatar}" style="width:28px; height:28px; border-radius:50%; object-fit:cover;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                         <div>
-                            <span style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'};">
+                            <span style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'};">
                                 ${escapeHtml(u.nickname || '익명')}${roleBadge}${pinnedBadge}
                             </span>
                             <span style="font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600; margin-left:6px;">
@@ -1582,7 +1627,7 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
     const modalBox = document.createElement('div');
     modalBox.id = 'ent2-analysis-modal-box';
     modalBox.style.cssText = `
-        background: ${isDark ? '#101013' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#0f172a'};
+        background: ${isDark ? '#101013' : '#ffffff'}; color: ${isDark ? '#f8fafc' : '#2c2d32'};
         border: 1px solid ${isDark ? '#27272a' : '#e4e4e7'}; border-radius: 20px;
         width: 820px; max-width: 95vw; height: 85vh; max-height: 900px;
         display: flex; flex-direction: column; overflow: hidden;
@@ -1598,12 +1643,12 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
                 <span style="font-size: 11px; font-weight: 800; color: #4f7cff; background: rgba(79, 124, 255, 0.12); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(79, 124, 255, 0.25);">
                     ent2 분석 결과
                 </span>
-                <span style="font-size: 14px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#0f172a'};">
+                <span style="font-size: 14px; font-weight: 800; color: ${isDark ? '#f8fafc' : '#2c2d32'};">
                     게시글 & 작성자 정밀 분석
                 </span>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
-                <button id="ent2-panel-fullscreen-btn" style="border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#0f172a'}; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" title="전체화면 / 축소 토글">
+                <button id="ent2-panel-fullscreen-btn" style="border: 1px solid ${isDark ? '#3f3f46' : '#cbd5e1'}; background: ${isDark ? '#27272a' : '#f1f5f9'}; color: ${isDark ? '#f8fafc' : '#2c2d32'}; cursor: pointer; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s;" title="전체화면 / 축소 토글">
                     <svg id="ent2-fs-icon-expand" style="width: 15px; height: 15px; color: #3182f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                     <svg id="ent2-fs-icon-compress" style="width: 15px; height: 15px; color: #4f7cff; display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 14l-5 5m0 0h4m-4 0v-4m11 5l5-5m0 0v4m0-4h-4M9 10L4 5m0 0v4m0-4h4m11 0l5 5m0 0h-4m4 0V5"/></svg>
                     <span id="ent2-fs-btn-label">전체화면</span>
@@ -1678,7 +1723,7 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
                 if (iconCompress) iconCompress.style.display = 'none';
                 if (fsLabel) fsLabel.textContent = '전체화면';
                 fsBtn.style.background = isDark ? '#27272a' : '#f1f5f9';
-                fsBtn.style.color = isDark ? '#f8fafc' : '#0f172a';
+                fsBtn.style.color = isDark ? '#f8fafc' : '#2c2d32';
                 fsBtn.style.borderColor = isDark ? '#3f3f46' : '#cbd5e1';
             }
         };
@@ -1830,7 +1875,7 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
                 ${formattedBody}
             </div>
 
-            <div id="ent2-raw-content-box" style="display: none; font-size: 12px; line-height: 1.55; font-family: monospace; color: ${isDark ? '#a1a1aa' : '#52525b'}; background: ${isDark ? '#0f172a' : '#f1f5f9'}; border: 1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius: 12px; padding: 14px; white-space: pre-wrap; word-break: break-all; margin-top: 14px;">
+            <div id="ent2-raw-content-box" style="display: none; font-size: 12px; line-height: 1.55; font-family: monospace; color: ${isDark ? '#a1a1aa' : '#52525b'}; background: ${isDark ? '#2c2d32' : '#f1f5f9'}; border: 1px solid ${isDark ? '#334155' : '#e2e8f0'}; border-radius: 12px; padding: 14px; white-space: pre-wrap; word-break: break-all; margin-top: 14px;">
                 ${escapeHtml(post.content || post.seContent || '')}
             </div>
 
@@ -2014,7 +2059,7 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
 
     // Hook tag pill buttons to trigger community exploration with tag
     bodyEl.querySelectorAll('.ent2-post-tag-pill').forEach(tagBtn => {
-        tagBtn.onclick = (e) => {
+        tagBtn.onclick = async (e) => {
             e.preventDefault();
             e.stopPropagation();
             const tagVal = tagBtn.getAttribute('data-tag');
@@ -2030,7 +2075,7 @@ async function openEnt2AnalysisSidePanel(postOrId, isDark, postCardEl) {
                     if (window.location.pathname.startsWith('/ent2/comm')) {
                         const commMount = currentCommContainer || document.getElementById('ent2-comm-filter-mount') || document.getElementById('ent2-tab-content-area');
                         if (commMount) {
-                            renderLiteCommunityFilterUI(commMount);
+                            await renderLiteCommunityFilterUI(commMount);
                             executeLiteCommunityQuery(commMount);
                         }
                     } else if (typeof handleEnt2PageRoute === 'function') {

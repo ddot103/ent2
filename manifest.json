@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ent2 ext",
-  "version": "3.0",
+  "version": "3.5",
   "description": "ent2 확장 프로그램: 검색, 탐색, 커뮤니티, 프로필 UI 및 이동용 설정 도구",
   "permissions": ["storage", "downloads", "notifications"],
   "icons": {

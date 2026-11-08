@@ -1,4 +1,4 @@
-// ent2 Profile Visualizer & Data Loader Module
+﻿// ent2 Profile Visualizer & Data Loader Module
 
 // Helper for handling empty/whitespace nicknames (e.g. zero-width spaces in Entry)
 function formatNicknameDisplay(nickname) {
@@ -293,7 +293,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
         container.innerHTML = `
             <div style="display:flex; flex-direction:column; gap:20px;">
                 <!-- 1. 프로필 커버 & 헤더 카드 -->
-                <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:20px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.05);">
+                <div class="ent2-page-card" style="overflow:hidden;">
                     <!-- 커버 이미지 -->
                     <div style="height:160px; width:100%; background:${coverUrl ? `url('${coverUrl}') center/cover no-repeat` : 'linear-gradient(135deg, #3182f6, #00c6ff)'}; position:relative; overflow:hidden;">
                         <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.5) 100%); pointer-events:none;"></div>
@@ -313,12 +313,12 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                     <!-- 유저 정보 구역 -->
                     <div style="padding:0 24px 24px 24px; position:relative; margin-top:-44px; z-index:10;">
                         <div style="display:flex; align-items:flex-start; gap:18px; flex-wrap:wrap; margin-bottom:16px;">
-                            <img src="${avatarUrl}" style="width:88px; height:88px; border-radius:50%; object-fit:cover; border:4px solid ${isDark ? '#121826' : '#ffffff'}; background:#ffffff; box-shadow:0 4px 16px rgba(0,0,0,0.12); flex-shrink:0; position:relative; z-index:2;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
+                            <img src="${avatarUrl}" style="width:88px; height:88px; border-radius:50%; object-fit:cover; border:4px solid ${isDark ? '#323339' : '#ffffff'}; background:#ffffff; box-shadow:0 4px 16px rgba(0,0,0,0.12); flex-shrink:0; position:relative; z-index:2;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                             
                             <div style="padding-top:48px; flex:1; min-width:220px;">
                                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                     ${markUrl ? `<img src="${markUrl}" style="width:20px; height:20px;" title="마크 뱃지">` : ''}
-                                    <h1 style="font-size:22px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#0f172a'}; letter-spacing:-0.02em; display:inline-flex; align-items:center; gap:6px;">
+                                    <h1 style="font-size:22px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#2c2d32'}; letter-spacing:-0.02em; display:inline-flex; align-items:center; gap:6px;">
                                         ${formatNicknameDisplay(userstatus.nickname)}
                                     </h1>
                                     <span style="font-size:11px; font-weight:700; background:#E8F3FF; color:#3182f6; padding:3px 10px; border-radius:6px; border:1px solid #BFDBFE;">${roleText}</span>
@@ -332,7 +332,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
 
                                 <div style="font-size:12px; color:${isDark ? '#94a3b8' : '#64748b'}; margin-top:8px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-weight:600;">
                                     <span style="display:inline-flex; align-items:center; gap:4px;">
-                                        유저네임: <strong style="color:${isDark ? '#f8fafc' : '#0f172a'};">@${escapeHtml(userstatus.username || '없음')}</strong>
+                                        유저네임: <strong style="color:${isDark ? '#f8fafc' : '#2c2d32'};">@${escapeHtml(userstatus.username || '없음')}</strong>
                                         ${userstatus.username ? `<button id="ent2-copy-username-btn" title="유저네임 복사" style="border:none; background:transparent; color:#3182f6; font-size:11px; font-weight:700; cursor:pointer; padding:0 4px;">복사</button>` : ''}
                                     </span>
                                     <span>•</span>
@@ -346,13 +346,13 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
 
                         <!-- 자기소개 설명 -->
                         ${userstatus.description ? `
-                            <div style="font-size:13px; color:${isDark ? '#cbd5e1' : '#334155'}; line-height:1.6; margin-bottom:16px; font-weight:500; white-space:pre-wrap; background:${isDark ? '#1a2234' : '#f8fafc'}; padding:12px 16px; border-radius:10px; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'};">
+                            <div style="font-size:13px; color:${isDark ? '#cbd5e1' : '#334155'}; line-height:1.6; margin-bottom:16px; font-weight:500; white-space:pre-wrap; background:${isDark ? '#414248' : '#f8fafc'}; padding:12px 16px; border-radius:10px; border:1px solid ${isDark ? '#414248' : '#e2e8f0'};">
                                 ${escapeHtml(userstatus.description)}
                             </div>
                         ` : ''}
 
                         <!-- 주요 메타 정보 메인 바 -->
-                        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:12px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600; padding-top:12px; border-top:1px solid ${isDark ? '#2a3447' : '#f1f5f9'};">
+                        <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:12px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600; padding-top:12px; border-top:1px solid ${isDark ? '#414248' : '#f1f5f9'};">
                             <span style="display:inline-flex; align-items:center; gap:5px;">
                                 <svg style="width:14px; height:14px; color:#3182f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 가입: <strong>${relativeCreatedStr}</strong> (${new Date(userstatus.created).toLocaleDateString('ko-KR')})
@@ -371,23 +371,23 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
 
                 <!-- 2. 종합 활동 지표 요약 Grid -->
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
                         <div style="font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">팔로워</div>
                         <div style="font-size:18px; font-weight:800; color:#3182f6;">${(statusData.follower || 0).toLocaleString()}</div>
                     </div>
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
                         <div style="font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">팔로잉</div>
                         <div style="font-size:18px; font-weight:800; color:#4f7cff;">${(statusData.following || 0).toLocaleString()}</div>
                     </div>
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
                         <div style="font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">공개 작품</div>
                         <div style="font-size:18px; font-weight:800; color:#3182f6;">${(statusData.project || 0).toLocaleString()} <span style="font-size:11px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">/ ${statusData.projectAll || 0}</span></div>
                     </div>
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
                         <div style="font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">커뮤니티 글</div>
                         <div style="font-size:18px; font-weight:800; color:#8b5cf6;">${totalCommPosts.toLocaleString()}</div>
                     </div>
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; padding:14px; text-align:center;">
                         <div style="font-size:11px; font-weight:700; color:${isDark ? '#94a3b8' : '#64748b'}; margin-bottom:4px;">북마크</div>
                         <div style="font-size:18px; font-weight:800; color:#ec4899;">${totalBookmarks.toLocaleString()}</div>
                     </div>
@@ -396,8 +396,8 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                 <!-- 3. 분야별 상세 통계 Grid -->
                 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
                     <!-- 작품 & 스터디 상세 통계 -->
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgChartIcon}
                             <span>작품 & 스터디 현황</span>
                         </h3>
@@ -408,13 +408,13 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                             </div>
                             <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'};">
                                 <span>비공개 / 임시 저장 작품</span>
-                                <strong style="color:${isDark ? '#f8fafc' : '#0f172a'}; font-weight:800;">${privateProjects.toLocaleString()}개</strong>
+                                <strong style="color:${isDark ? '#f8fafc' : '#2c2d32'}; font-weight:800;">${privateProjects.toLocaleString()}개</strong>
                             </div>
                             <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'};">
                                 <span>전체 생성 작품</span>
-                                <strong style="color:${isDark ? '#f8fafc' : '#0f172a'}; font-weight:800;">${(statusData.projectAll || 0).toLocaleString()}개</strong>
+                                <strong style="color:${isDark ? '#f8fafc' : '#2c2d32'}; font-weight:800;">${(statusData.projectAll || 0).toLocaleString()}개</strong>
                             </div>
-                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#2a3447' : '#e2e8f0'}; padding-top:8px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#414248' : '#e2e8f0'}; padding-top:8px;">
                                 <span>스터디 목록</span>
                                 <strong style="color:#4f7cff; font-weight:800;">${statusData.studyAll || 0}개</strong>
                             </div>
@@ -422,8 +422,8 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                     </div>
 
                     <!-- 커뮤니티 작성글 상세 통계 -->
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgCommIcon}
                             <span>커뮤니티 작성 글</span>
                         </h3>
@@ -440,7 +440,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                 <span>노하우 & 팁 (노팁)</span>
                                 <strong style="color:#f59e0b; font-weight:800;">${(commData.tips || 0).toLocaleString()}개</strong>
                             </div>
-                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#2a3447' : '#e2e8f0'}; padding-top:8px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#414248' : '#e2e8f0'}; padding-top:8px;">
                                 <span>총 커뮤니티 게시글</span>
                                 <strong style="color:#8b5cf6; font-weight:800;">${totalCommPosts.toLocaleString()}개</strong>
                             </div>
@@ -448,8 +448,8 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                     </div>
 
                     <!-- 북마크 (즐겨찾기) 상세 통계 -->
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgBookmarkIcon}
                             <span>북마크 (즐겨찾기)</span>
                         </h3>
@@ -466,7 +466,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                 <span>북마크한 스터디</span>
                                 <strong style="color:#4f7cff; font-weight:800;">${(bookmarkData.study || 0).toLocaleString()}개</strong>
                             </div>
-                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#2a3447' : '#e2e8f0'}; padding-top:8px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; color:${isDark ? '#cbd5e1' : '#475569'}; border-top:1px dashed ${isDark ? '#414248' : '#e2e8f0'}; padding-top:8px;">
                                 <span>총 북마크 항목</span>
                                 <strong style="color:#ec4899; font-weight:800;">${totalBookmarks.toLocaleString()}개</strong>
                             </div>
@@ -476,8 +476,8 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
 
                 <!-- 4. 대표 뱃지 / 수상 내역 -->
                 ${prizeList.length > 0 ? `
-                    <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                    <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0 0 14px 0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgTrophyIcon}
                             <span>대표 뱃지 및 수상 내역 (${prizeList.length}개)</span>
                         </h3>
@@ -485,10 +485,10 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                             ${prizeList.map(p => {
                                 const pImg = p.prizeImageData?.path ? `https://playentry.org/uploads${p.prizeImageData.path}` : null;
                                 return `
-                                    <div style="background:${isDark ? '#1a2234' : '#f8fafc'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
+                                    <div style="background:${isDark ? '#414248' : '#f8fafc'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:10px;">
                                         ${pImg ? `<img src="${pImg}" style="width:32px; height:32px; object-fit:contain;">` : `<svg style="width:24px; height:24px; color:#f59e0b;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`}
                                         <div>
-                                            <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'};">${escapeHtml(p.prizeName || p.badgeText || '뱃지')}</div>
+                                            <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'};">${escapeHtml(p.prizeName || p.badgeText || '뱃지')}</div>
                                             <div style="font-size:11px; color:${isDark ? '#94a3b8' : '#64748b'}; margin-top:2px; font-weight:600;">${escapeHtml(p.category || p.contest?.name || '상장')}</div>
                                         </div>
                                     </div>
@@ -499,15 +499,15 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                 ` : ''}
 
                 <!-- 5. 유저 커뮤니티 작성 기록 -->
-                <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
                     <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgDocIcon}
                             <span>작성한 커뮤니티 글</span>
                         </h3>
 
                         <!-- 카테고리 선택 탭 -->
-                        <div id="ent2-user-comm-cat-tabs" style="display:flex; align-items:center; gap:3px; background:${isDark ? '#1a2234' : '#f1f5f9'}; padding:3px; border-radius:8px; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; font-size:11px; font-weight:700;">
+                        <div id="ent2-user-comm-cat-tabs" style="display:flex; align-items:center; gap:3px; background:${isDark ? '#414248' : '#f1f5f9'}; padding:3px; border-radius:8px; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; font-size:11px; font-weight:700;">
                             <button data-cat="all" class="ent2-user-comm-tab-btn" style="padding:5px 10px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; background:${ent2UserCommCategory === 'all' ? '#3182f6' : 'transparent'}; color:${ent2UserCommCategory === 'all' ? '#fff' : (isDark ? '#94a3b8' : '#64748b')};">전체</button>
                             <button data-cat="free" class="ent2-user-comm-tab-btn" style="padding:5px 10px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; background:${ent2UserCommCategory === 'free' ? '#3182f6' : 'transparent'}; color:${ent2UserCommCategory === 'free' ? '#fff' : (isDark ? '#94a3b8' : '#64748b')};">엔이</button>
                             <button data-cat="qna" class="ent2-user-comm-tab-btn" style="padding:5px 10px; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; background:${ent2UserCommCategory === 'qna' ? '#3182f6' : 'transparent'}; color:${ent2UserCommCategory === 'qna' ? '#fff' : (isDark ? '#94a3b8' : '#64748b')};">묻답</button>
@@ -524,9 +524,9 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                 </div>
 
                 <!-- 6. 유저 공개 작품 리스트 -->
-                <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgGamepadIcon}
                             <span>공개 작품 목록 (${userProjects?.total || projectList.length}개)</span>
                         </h3>
@@ -544,15 +544,15 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                     thumbUrl = 'https://playentry.org' + thumbUrl;
                                 }
                                 return `
-                                    <a href="https://playentry.org/project/${proj.id}" target="_blank" rel="noopener noreferrer" style="background:${isDark ? '#1a2234' : '#f8fafc'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; overflow:hidden; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; transition:border-color 0.15s;">
+                                    <a href="https://playentry.org/project/${proj.id}" target="_blank" rel="noopener noreferrer" style="background:${isDark ? '#414248' : '#f8fafc'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; overflow:hidden; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; transition:border-color 0.15s;">
                                         <div>
-                                            <div style="width:100%; height:110px; background:#0f172a; position:relative; overflow:hidden;">
+                                            <div style="width:100%; height:110px; background:#2c2d32; position:relative; overflow:hidden;">
                                                 <img src="${thumbUrl || 'https://playentry.org/img/DefaultCardUserThmb.svg'}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                                                 ${proj.staffPicked ? `<img src="https://playentry.org/img/IcoDefaultCardStaff.svg" alt="스선" style="position:absolute; top:4px; left:4px; width:34px; height:30px; object-fit:contain;">` : ''}
                                                 ${proj.ranked ? `<img src="https://playentry.org/img/IcoDefaultCardPopular.svg" alt="인작" style="position:absolute; top:4px; right:4px; width:34px; height:30px; object-fit:contain;">` : ''}
                                             </div>
                                             <div style="padding:10px 12px;">
-                                                <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'}; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'}; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                                     ${escapeHtml(proj.name || '무제')}
                                                 </div>
                                                 <div style="font-size:11px; color:#3182f6; font-weight:700;">
@@ -561,7 +561,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                             </div>
                                         </div>
 
-                                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
+                                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#414248' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
                                             <span>조회 ${proj.visit || 0}</span>
                                             <span>좋아요 ${proj.likeCnt || 0}</span>
                                             <span>댓글 ${proj.comment || 0}</span>
@@ -574,9 +574,9 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                 </div>
 
                 <!-- 7. 유저 북마크한 작품 목록 -->
-                <div style="background:${isDark ? '#121826' : '#ffffff'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:16px; padding:18px;">
+                <div style="background:${isDark ? '#323339' : '#ffffff'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:16px; padding:18px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#0f172a'}; display:flex; align-items:center; gap:8px;">
+                        <h3 style="font-size:14px; font-weight:800; margin:0; color:${isDark ? '#f8fafc' : '#2c2d32'}; display:flex; align-items:center; gap:8px;">
                             ${svgBookmarkIcon}
                             <span>북마크한 작품 (${favoriteProjectTotal}개)</span>
                         </h3>
@@ -594,15 +594,15 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                     thumbUrl = 'https://playentry.org' + thumbUrl;
                                 }
                                 return `
-                                    <a href="https://playentry.org/project/${proj.id}" target="_blank" rel="noopener noreferrer" style="background:${isDark ? '#1a2234' : '#f8fafc'}; border:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; border-radius:12px; overflow:hidden; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; transition:border-color 0.15s;">
+                                    <a href="https://playentry.org/project/${proj.id}" target="_blank" rel="noopener noreferrer" style="background:${isDark ? '#414248' : '#f8fafc'}; border:1px solid ${isDark ? '#414248' : '#e2e8f0'}; border-radius:12px; overflow:hidden; text-decoration:none; display:flex; flex-direction:column; justify-content:space-between; transition:border-color 0.15s;">
                                         <div>
-                                            <div style="width:100%; height:110px; background:#0f172a; position:relative; overflow:hidden;">
+                                            <div style="width:100%; height:110px; background:#2c2d32; position:relative; overflow:hidden;">
                                                 <img src="${thumbUrl || 'https://playentry.org/img/DefaultCardUserThmb.svg'}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://playentry.org/img/DefaultCardUserThmb.svg'">
                                                 ${proj.staffPicked ? `<img src="https://playentry.org/img/IcoDefaultCardStaff.svg" alt="스선" style="position:absolute; top:4px; left:4px; width:34px; height:30px; object-fit:contain;">` : ''}
                                                 ${proj.ranked ? `<img src="https://playentry.org/img/IcoDefaultCardPopular.svg" alt="인작" style="position:absolute; top:4px; right:4px; width:34px; height:30px; object-fit:contain;">` : ''}
                                             </div>
                                             <div style="padding:10px 12px;">
-                                                <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#0f172a'}; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                                <div style="font-size:12.5px; font-weight:800; color:${isDark ? '#f8fafc' : '#2c2d32'}; margin-bottom:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                                                     ${escapeHtml(proj.name || '무제')}
                                                 </div>
                                                 <div style="font-size:11px; color:#ec4899; font-weight:700;">
@@ -611,7 +611,7 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                             </div>
                                         </div>
 
-                                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#2a3447' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
+                                        <div style="padding:8px 12px; border-top:1px solid ${isDark ? '#414248' : '#e2e8f0'}; display:flex; align-items:center; justify-content:space-between; font-size:10.5px; color:${isDark ? '#94a3b8' : '#64748b'}; font-weight:600;">
                                             <span>조회 ${proj.visit || 0}</span>
                                             <span>좋아요 ${proj.likeCnt || 0}</span>
                                             <span>댓글 ${proj.comment || 0}</span>
@@ -746,12 +746,12 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
                                     </div>
 
                                     ${thumbnail ? `
-                                        <div class="ent2-post-card-thumb" data-post-idx="${pIdx}" style="width:100%; height:120px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:${isDark ? '#0f172a' : '#f1f5f9'}; cursor:pointer; position:relative; border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'};" title="이미지 미리보기 (클릭 시 상세보기)">
+                                        <div class="ent2-post-card-thumb" data-post-idx="${pIdx}" style="width:100%; height:120px; border-radius:12px; overflow:hidden; margin-bottom:10px; background:${isDark ? '#2c2d32' : '#f1f5f9'}; cursor:pointer; position:relative; border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'};" title="이미지 미리보기 (클릭 시 상세보기)">
                                             <img src="${escapeHtml(thumbnail)}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.2s;" onerror="this.parentElement.style.display='none';" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
                                         </div>
                                     ` : ''}
 
-                                    <a href="${postUrl}" target="_blank" style="text-decoration:none; font-size:13px; font-weight:700; color:${isDark ? '#f8fafc' : '#0f172a'}; line-height:1.45; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:12px;">
+                                    <a href="${postUrl}" target="_blank" style="text-decoration:none; font-size:13px; font-weight:700; color:${isDark ? '#f8fafc' : '#2c2d32'}; line-height:1.45; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; margin-bottom:12px;">
                                         ${escapeHtml(titleText)}
                                     </a>
                                 </div>
@@ -832,4 +832,3 @@ async function loadEnt2FullUserProfile(container, isDark, userId, navTo) {
         `;
     }
 }
-
